@@ -1,0 +1,544 @@
+#version 430 core
+
+layout(binding = 2, rgba32f) uniform image2D framebuffer;
+
+uniform sampler2D colorTexture;
+uniform mat4 mat_inverse;
+uniform mat4 persp_inverse;
+uniform float lightIntensity;
+uniform vec3 lightPosition;
+uniform bool blinnPhong;
+uniform bool transparent;
+uniform float shininess;
+uniform float eta;
+uniform float radius;
+uniform float groundDistance;
+uniform vec3 center;
+uniform int counter;
+
+const float[256] haltonx = float[](0.5, 0.25, 0.75, 0.125, 0.625, 0.375, 0.875, 0.0625, 0.5625, 0.3125, 0.8125, 0.1875, 0.6875, 0.4375, 0.9375, 0.03125, 0.53125, 0.28125, 0.78125, 0.15625, 0.65625, 0.40625, 0.90625, 0.09375, 0.59375, 0.34375, 0.84375, 0.21875, 0.71875, 0.46875, 0.96875, 0.015625, 0.515625, 0.265625, 0.765625, 0.140625, 0.640625, 0.390625, 0.890625, 0.078125, 0.578125, 0.328125, 0.828125, 0.203125, 0.703125, 0.453125, 0.953125, 0.046875, 0.546875, 0.296875, 0.796875, 0.171875, 0.671875, 0.421875, 0.921875, 0.109375, 0.609375, 0.359375, 0.859375, 0.234375, 0.734375, 0.484375, 0.984375, 0.0078125, 0.5078125, 0.2578125, 0.7578125, 0.1328125, 0.6328125, 0.3828125, 0.8828125, 0.0703125, 0.5703125, 0.3203125, 0.8203125, 0.1953125, 0.6953125, 0.4453125, 0.9453125, 0.0390625, 0.5390625, 0.2890625, 0.7890625, 0.1640625, 0.6640625, 0.4140625, 0.9140625, 0.1015625, 0.6015625, 0.3515625, 0.8515625, 0.2265625, 0.7265625, 0.4765625, 0.9765625, 0.0234375, 0.5234375, 0.2734375, 0.7734375, 0.1484375, 0.6484375, 0.3984375, 0.8984375, 0.0859375, 0.5859375, 0.3359375, 0.8359375, 0.2109375, 0.7109375, 0.4609375, 0.9609375, 0.0546875, 0.5546875, 0.3046875, 0.8046875, 0.1796875, 0.6796875, 0.4296875, 0.9296875, 0.1171875, 0.6171875, 0.3671875, 0.8671875, 0.2421875, 0.7421875, 0.4921875, 0.9921875, 0.00390625, 0.50390625, 0.25390625, 0.75390625, 0.12890625, 0.62890625, 0.37890625, 0.87890625, 0.06640625, 0.56640625, 0.31640625, 0.81640625, 0.19140625, 0.69140625, 0.44140625, 0.94140625, 0.03515625, 0.53515625, 0.28515625, 0.78515625, 0.16015625, 0.66015625, 0.41015625, 0.91015625, 0.09765625, 0.59765625, 0.34765625, 0.84765625, 0.22265625, 0.72265625, 0.47265625, 0.97265625, 0.01953125, 0.51953125, 0.26953125, 0.76953125, 0.14453125, 0.64453125, 0.39453125, 0.89453125, 0.08203125, 0.58203125, 0.33203125, 0.83203125, 0.20703125, 0.70703125, 0.45703125, 0.95703125, 0.05078125, 0.55078125, 0.30078125, 0.80078125, 0.17578125, 0.67578125, 0.42578125, 0.92578125, 0.11328125, 0.61328125, 0.36328125, 0.86328125, 0.23828125, 0.73828125, 0.48828125, 0.98828125, 0.01171875, 0.51171875, 0.26171875, 0.76171875, 0.13671875, 0.63671875, 0.38671875, 0.88671875, 0.07421875, 0.57421875, 0.32421875, 0.82421875, 0.19921875, 0.69921875, 0.44921875, 0.94921875, 0.04296875, 0.54296875, 0.29296875, 0.79296875, 0.16796875, 0.66796875, 0.41796875, 0.91796875, 0.10546875, 0.60546875, 0.35546875, 0.85546875, 0.23046875, 0.73046875, 0.48046875, 0.98046875, 0.02734375, 0.52734375, 0.27734375, 0.77734375, 0.15234375, 0.65234375, 0.40234375, 0.90234375, 0.08984375, 0.58984375, 0.33984375, 0.83984375, 0.21484375, 0.71484375, 0.46484375, 0.96484375, 0.05859375, 0.55859375, 0.30859375, 0.80859375, 0.18359375, 0.68359375, 0.43359375, 0.93359375, 0.12109375, 0.62109375, 0.37109375, 0.87109375, 0.24609375, 0.74609375, 0.49609375, 0.99609375, 0.001953125);
+const float[256] haltony = float[](0.3333333333333333, 0.6666666666666666, 0.1111111111111111, 0.4444444444444444, 0.7777777777777778, 0.2222222222222222, 0.5555555555555556, 0.8888888888888888, 0.037037037037037035, 0.37037037037037035, 0.7037037037037037, 0.14814814814814814, 0.48148148148148145, 0.8148148148148148, 0.25925925925925924, 0.5925925925925926, 0.9259259259259259, 0.07407407407407407, 0.4074074074074074, 0.7407407407407407, 0.18518518518518517, 0.5185185185185185, 0.8518518518518519, 0.2962962962962963, 0.6296296296296297, 0.9629629629629629, 0.012345679012345678, 0.345679012345679, 0.6790123456790124, 0.12345679012345678, 0.4567901234567901, 0.7901234567901234, 0.2345679012345679, 0.5679012345679012, 0.9012345679012346, 0.04938271604938271, 0.38271604938271603, 0.7160493827160493, 0.16049382716049382, 0.49382716049382713, 0.8271604938271605, 0.2716049382716049, 0.6049382716049383, 0.9382716049382716, 0.08641975308641975, 0.41975308641975306, 0.7530864197530864, 0.19753086419753085, 0.5308641975308642, 0.8641975308641975, 0.30864197530864196, 0.6419753086419753, 0.9753086419753086, 0.024691358024691357, 0.35802469135802467, 0.691358024691358, 0.13580246913580246, 0.4691358024691358, 0.8024691358024691, 0.24691358024691357, 0.5802469135802469, 0.9135802469135802, 0.06172839506172839, 0.3950617283950617, 0.7283950617283951, 0.1728395061728395, 0.5061728395061729, 0.8395061728395061, 0.2839506172839506, 0.6172839506172839, 0.9506172839506173, 0.09876543209876543, 0.43209876543209874, 0.7654320987654321, 0.20987654320987653, 0.5432098765432098, 0.8765432098765432, 0.32098765432098764, 0.654320987654321, 0.9876543209876543, 0.00411522633744856, 0.3374485596707819, 0.6707818930041153, 0.11522633744855967, 0.448559670781893, 0.7818930041152263, 0.22633744855967078, 0.5596707818930041, 0.8930041152263375, 0.0411522633744856, 0.37448559670781895, 0.7078189300411523, 0.1522633744855967, 0.48559670781893005, 0.8189300411522634, 0.26337448559670784, 0.5967078189300411, 0.9300411522633745, 0.07818930041152264, 0.411522633744856, 0.7448559670781894, 0.18930041152263374, 0.522633744855967, 0.8559670781893004, 0.3004115226337449, 0.6337448559670782, 0.9670781893004116, 0.01646090534979424, 0.3497942386831276, 0.6831275720164609, 0.12757201646090535, 0.4609053497942387, 0.7942386831275721, 0.23868312757201646, 0.5720164609053497, 0.9053497942386831, 0.053497942386831275, 0.3868312757201646, 0.720164609053498, 0.1646090534979424, 0.49794238683127573, 0.831275720164609, 0.2757201646090535, 0.6090534979423868, 0.9423868312757202, 0.09053497942386832, 0.42386831275720166, 0.757201646090535, 0.20164609053497942, 0.5349794238683128, 0.8683127572016461, 0.31275720164609055, 0.6460905349794238, 0.9794238683127572, 0.02880658436213992, 0.36213991769547327, 0.6954732510288066, 0.13991769547325103, 0.4732510288065844, 0.8065843621399177, 0.25102880658436216, 0.5843621399176955, 0.9176954732510288, 0.06584362139917696, 0.3991769547325103, 0.7325102880658436, 0.17695473251028807, 0.5102880658436214, 0.8436213991769548, 0.2880658436213992, 0.6213991769547325, 0.9547325102880658, 0.102880658436214, 0.43621399176954734, 0.7695473251028807, 0.2139917695473251, 0.5473251028806584, 0.8806584362139918, 0.32510288065843623, 0.6584362139917695, 0.9917695473251029, 0.00823045267489712, 0.34156378600823045, 0.6748971193415638, 0.11934156378600823, 0.45267489711934156, 0.7860082304526749, 0.23045267489711935, 0.5637860082304527, 0.897119341563786, 0.04526748971193416, 0.3786008230452675, 0.7119341563786008, 0.15637860082304528, 0.4897119341563786, 0.823045267489712, 0.2674897119341564, 0.6008230452674898, 0.934156378600823, 0.0823045267489712, 0.4156378600823045, 0.7489711934156379, 0.1934156378600823, 0.5267489711934157, 0.8600823045267489, 0.3045267489711934, 0.6378600823045267, 0.9711934156378601, 0.0205761316872428, 0.35390946502057613, 0.6872427983539094, 0.13168724279835392, 0.46502057613168724, 0.7983539094650206, 0.24279835390946503, 0.5761316872427984, 0.9094650205761317, 0.05761316872427984, 0.39094650205761317, 0.7242798353909465, 0.16872427983539096, 0.5020576131687243, 0.8353909465020576, 0.27983539094650206, 0.6131687242798354, 0.9465020576131687, 0.09465020576131687, 0.4279835390946502, 0.7613168724279835, 0.205761316872428, 0.5390946502057613, 0.8724279835390947, 0.3168724279835391, 0.6502057613168725, 0.9835390946502057, 0.03292181069958848, 0.3662551440329218, 0.6995884773662552, 0.1440329218106996, 0.4773662551440329, 0.8106995884773662, 0.2551440329218107, 0.588477366255144, 0.9218106995884774, 0.06995884773662552, 0.40329218106995884, 0.7366255144032922, 0.18106995884773663, 0.51440329218107, 0.8477366255144033, 0.29218106995884774, 0.6255144032921811, 0.9588477366255144, 0.10699588477366255, 0.4403292181069959, 0.7736625514403292, 0.21810699588477367, 0.551440329218107, 0.8847736625514403, 0.3292181069958848, 0.6625514403292181, 0.9958847736625515, 0.0013717421124828531, 0.3347050754458162, 0.6680384087791496, 0.11248285322359397, 0.4458161865569273, 0.7791495198902606, 0.22359396433470508, 0.5569272976680384, 0.8902606310013718, 0.038408779149519894, 0.3717421124828532, 0.7050754458161865, 0.149519890260631, 0.4828532235939643);
+
+#define MAX_SCENE_BOUNDS    10.0
+#define EPS                 0.000001
+
+#define MIN_DISTANCE EPS
+#define GROUND_VPTR -1
+
+#define M_1_PI 0.31830988618
+
+#define Ka 0.05
+#define Kd 0.3
+
+struct hitinfo_t {
+    /* Index of the first index of the triangle */
+    /* or: GROUND_VPTR */
+    int hit_vptr;
+    /* Intersection distance, barycentric coordinates */
+    /* or: intersection distance, 0, texture coordinates (for the ground) */
+    vec4 t;
+};
+
+struct BVHNode {
+    vec4 min;
+    vec4 max;
+    int nbTriangles;
+    int index;
+};
+
+layout (std430, binding = 1) buffer Vertices
+{
+    vec4 vertices[];
+};
+
+layout (std430, binding = 2) buffer Normals
+{
+    vec4 normals[];
+};
+
+layout (std430, binding = 3) buffer Colors
+{
+    vec4 colors[];
+};
+
+layout (std430, binding = 4) buffer Meshes
+{
+    int indices[];
+};
+
+layout (std430, binding = 5) buffer BVHNodes
+{
+    BVHNode nodes[];
+};
+
+
+// Check whether there is an intersection between the ray (origin, dir) and the bounding box (bbmin, bbmax), 
+// stores into tNear the nearest point of intersection on the ray.
+bool intersectBoundingBox(vec4 origin, vec4 dir, vec4 bbmin, vec4 bbmax, out float tNear)
+{
+	// intersect with BB:
+    vec4 sMin = (bbmin - origin) / dir;
+    vec4 sMax = (bbmax - origin) / dir;
+
+    vec4 tMin = min(sMin, sMax);
+    vec4 tMax = max(sMin, sMax);
+
+    tNear = max(max(tMin.x, tMin.y), tMin.z);
+    float tFar = min(min(tMax.x, tMax.y), tMax.z);
+
+	if (tNear < 0) tNear = 0; // starting point inside the BVH
+    return tNear <= tFar;
+}
+
+// intersect ray (origin, dir) with triangle defined by ptr (number inside indexed face set)
+// returns a boolean, plus the "t" of hitinfo structure (Intersection distance, barycentric coordinates)
+bool intersectTriangle(vec4 origin, vec4 dir, int ptr, out vec4 dist)
+{
+	// vertices from data:
+    vec4 v0 = vertices[indices[ptr]];
+    vec4 v1 = vertices[indices[ptr + 1]];
+    vec4 v2 = vertices[indices[ptr + 2]];
+
+    vec3 e1 = (v1 - v0).xyz;
+    vec3 e2 = (v2 - v0).xyz;
+
+    vec3 p = cross(dir.xyz, e2);
+    float det = dot(e1, p);
+    if (abs(det) < EPS) return false;
+
+    // We do early exit here: as soon as we can return false, we do.
+    // In my tests, it is faster than computing all coordinates, 
+    // *then* checking validity with a single test. YMMV, feel free to test
+    vec3 t = (origin - v0).xyz;
+    dist.y = dot(t, p);
+    if (dist.y < 0.0 || dist.y > det) return false;
+    vec3 q = cross(t, e1);
+    dist.z = dot(dir.xyz, q);
+    if (dist.z < 0.0 || dist.z > det) return false;
+    dist.w = det - dist.y - dist.z;
+    if (dist.w < 0.0) return false;
+    dist.x = dot(e2, q);
+    dist /= det;
+    return (dist.x > EPS);
+}
+
+bool intersectGround(vec4 origin, vec4 dir, out vec4 dist)
+{
+    if (abs(dir.y) < EPS)
+        return false;
+    float t = -(origin.y + groundDistance) / dir.y;
+
+    if (t < MIN_DISTANCE)
+        return false;
+
+    vec4 point = origin + t * dir;
+    point.y = -groundDistance;
+    vec4 scaledPoint = point / radius ;
+    vec2 texCoords = 0.5 * scaledPoint.xz + 0.5;
+
+    dist = vec4(t, 0.0, texCoords);
+
+    return true;
+}
+
+vec4 interpolateColor(hitinfo_t h)
+{
+	if (colors.length() > 0) {
+		vec4 c0 = colors[indices[h.hit_vptr]];
+		vec4 c1 = colors[indices[h.hit_vptr + 1]];
+		vec4 c2 = colors[indices[h.hit_vptr + 2]];
+		return (h.t.w * c0 + h.t.y * c1 + h.t.z * c2);
+	} else return vec4(0.7, 0.7, 0.7, 1.0);
+}
+
+vec4 interpolateNormal(hitinfo_t h)
+{
+	if (normals.length() > 0) {
+        vec4 n0 = normals[indices[h.hit_vptr]];
+        vec4 n1 = normals[indices[h.hit_vptr + 1]];
+        vec4 n2 = normals[indices[h.hit_vptr + 2]];
+        return normalize(h.t.w * n0 + h.t.y * n1 + h.t.z * n2);
+    } else return vec4(1,0,0,1);
+}
+
+// BVH-related functions:
+bool isLeaf(BVHNode node)
+{
+    return node.nbTriangles != 0;
+}
+
+bool intersectBVHLeaf(BVHNode node, vec4 origin, vec4 dir, inout hitinfo_t h)
+{
+    bool hit = false;
+
+    for (int i = 0; i < node.nbTriangles; ++i) {
+        int vptr = 3 * (node.index + i);
+        vec4 dist;
+        if (intersectTriangle(origin, dir, vptr, dist) && dist.x < h.t.x) {
+            hit = true;
+            h.hit_vptr = vptr;
+            h.t = dist;
+        }
+    }
+
+    return hit;
+}
+
+bool intersectBVHLeaf(BVHNode node, vec4 origin, vec4 dir)
+{
+    for (int i = 0; i < node.nbTriangles; ++i) {
+        int vptr = 3 * (node.index + i);
+        vec4 dist;
+        if (intersectTriangle(origin, dir, vptr, dist))
+            return true;
+    }
+
+    return false;
+}
+
+#define MAX_STACK_SIZE 64
+
+#define push(stack, size, value) stack[size++] = value
+#define pop(stack, size) stack[--size]
+
+bool intersectBVH(vec4 origin, vec4 dir, inout hitinfo_t h)
+{
+    int rootIndex = 0;
+    BVHNode rootNode = nodes[rootIndex];
+    float tNear;
+
+    if (!intersectBoundingBox(origin, dir, rootNode.min, rootNode.max, tNear))
+        return false;
+
+    struct StackElement {
+        int index;
+        float t;
+    } stack[MAX_STACK_SIZE];
+    int size = 0;
+
+    push(stack, size, StackElement(rootIndex, 0.0));
+
+    bool hit = false;
+
+
+    while (size != 0) {
+        StackElement current = pop(stack, size);
+        if (h.t.x < current.t)
+            continue;
+
+        BVHNode currentNode = nodes[current.index];
+        if (isLeaf(currentNode)) {
+            hit = intersectBVHLeaf(currentNode, origin, dir, h) || hit;
+        } else {
+            StackElement left = StackElement(current.index + 1, 0.0);
+            BVHNode leftNode = nodes[left.index];
+            bool hitLeft = intersectBoundingBox(origin, dir, leftNode.min, leftNode.max, left.t);
+
+            StackElement right = StackElement(currentNode.index, 0.0);
+            BVHNode rightNode = nodes[right.index];
+            bool hitRight = intersectBoundingBox(origin, dir, rightNode.min, rightNode.max, right.t);
+
+            if (hitLeft && hitRight) {
+                if (left.t < right.t) {
+                    push(stack, size, right);
+                    push(stack, size, left);
+                } else {
+                    push(stack, size, left);
+                    push(stack, size, right);
+                }
+            } else if (hitLeft) {
+                push(stack, size, left);
+            } else if (hitRight) {
+                push(stack, size, right);
+            }
+        }
+    }
+
+
+    return hit;
+}
+
+bool intersectBVH(vec4 origin, vec4 dir)
+{
+    int rootIndex = 0;
+    BVHNode rootNode = nodes[rootIndex];
+    float tNear;
+
+    if (!intersectBoundingBox(origin, dir, rootNode.min, rootNode.max, tNear))
+        return false;
+
+    int stack[MAX_STACK_SIZE];
+    int size = 0;
+
+    push(stack, size, rootIndex);
+
+    while (size != 0) {
+        int current = pop(stack, size);
+        BVHNode currentNode = nodes[current];
+        if (isLeaf(currentNode)) {
+            if (intersectBVHLeaf(currentNode, origin, dir))
+                return true;
+        } else {
+            int left = current + 1;
+            BVHNode leftNode = nodes[left];
+            bool hitLeft = intersectBoundingBox(origin, dir, leftNode.min, leftNode.max, tNear);
+
+            int right = currentNode.index;
+            BVHNode rightNode = nodes[right];
+            bool hitRight = intersectBoundingBox(origin, dir, rightNode.min, rightNode.max, tNear);
+
+            if (hitLeft && hitRight) {
+                push(stack, size, right);
+                push(stack, size, left);
+            } else if (hitLeft) {
+                push(stack, size, left);
+            } else if (hitRight) {
+                push(stack, size, right);
+            }
+        }
+    }
+
+    return false;
+}
+// End BVH-related functions
+
+// Compute the first intersection along the ray (origin, dir). 
+// returns the nearest intersection in h
+bool firstIntersection(vec4 origin, vec4 dir, out hitinfo_t h)
+{
+    h.t.x = radius * MAX_SCENE_BOUNDS;
+
+    bool hit = intersectBVH(origin, dir, h);
+
+    vec4 dist;
+    if (intersectGround(origin, dir, dist) && dist.x < h.t.x) {
+        hit = true;
+        h.hit_vptr = GROUND_VPTR;
+        h.t = dist;
+    }
+
+	return hit;
+}
+
+// checks whether there is any intersection along the ray (origin, dir)
+// Does not compute the nearest intersection, ends the loop as soon as an intersection is found.
+bool isIntersected(vec4 origin, vec4 dir)
+{
+    vec4 dist;
+    return intersectGround(origin, dir, dist) || intersectBVH(origin, dir);
+}
+
+float ftheta(float costheta)
+{
+    float ci = max(pow(eta * eta - (1 - costheta * costheta), 0.5), 0);
+    float fs = (costheta - ci) * (costheta - ci)  / ((costheta + ci) * (costheta + ci));
+    float fp = (eta * eta * costheta - ci) * (eta * eta * costheta - ci)  / ((eta * eta * costheta + ci) * (eta * eta * costheta + ci));
+    return (fs + fp) / 2;
+}
+
+float D(float costheta, float alpha)
+{
+    if (costheta >= 0){
+        float a = M_1_PI / (costheta * costheta * costheta * costheta);
+        float tan2 = 1/(costheta * costheta) - 1;
+        float b = alpha * alpha / ((alpha * alpha + tan2 * tan2) * (alpha * alpha + tan2 * tan2));
+        return a * b;
+    }
+    return 0;
+}
+
+float G1(float costheta, float alpha)
+{
+    float tan2 = 1/(costheta * costheta) - 1;
+    return 2/ (1 + pow(1 + alpha * alpha * tan2 * tan2, 0.5));
+}
+
+// Local illumination related functions. TODO
+vec4 directIllumination(vec4 color, vec4 p, vec4 n, vec4 v)
+{
+	// Goal: compute direct illumination at point p, from the light source at lightPosition.
+	// color: local material color, RGBA
+	// p: coordinates of intersection point, xyzw
+	// n: normal at intersection point, xyzw
+	// v: incoming viewing direction. Points towards the eye.
+    
+    vec4 dir = vec4(lightPosition, 1) - p;
+    vec4 l = normalize(dir);
+    
+    vec4 h = normalize(v + l);
+    float hnpows = pow(max(dot(h, n), 0), shininess);
+    float costhetad = dot(h, normalize(v));
+
+    float fthetad = ftheta(costhetad);
+
+    //check light
+
+    vec4 ca = vec4(0, 0, 0, 1);
+    vec4 cd = vec4(0, 0, 0, 1);
+    vec4 cs = vec4(0, 0, 0, 1);
+
+    // Blinn Phong
+    if (blinnPhong){    
+        ca = Ka * color * lightIntensity;
+        if (!isIntersected(p, dir)){
+            cd = Kd * color * max(dot(n, l), 0) * lightIntensity;
+            cs = fthetad * color * hnpows * lightIntensity;
+        }
+    }
+    // Cook-Torrance
+    else {
+        ca = Ka * color * lightIntensity;
+        if (!isIntersected(p, dir)){
+            cd = Kd * color * max(dot(n, l), 0) * lightIntensity;
+            float alpha = sqrt(2/ (shininess + 2));
+            vec4 lightSource = normalize(vec4(lightPosition, 1)-p);
+            float costhetah = dot(h, n);
+            float costhetao = dot(n, normalize(v));
+            float costhetai = dot(n, lightSource);
+            cs = fthetad * D(costhetah, alpha) * G1(costhetai, alpha) * G1(costhetao, alpha) / (4 * costhetai * costhetao) * color * hnpows * lightIntensity;
+        }
+    }
+	return ca + cd + cs;
+}
+
+const int MAX_TRACE = 3;
+
+void getLocal(vec4 origin, vec4 dir, hitinfo_t h, out vec4 color, out vec4 p, out vec4 n)
+{
+    p = origin + h.t.x * dir;
+    if (h.hit_vptr == GROUND_VPTR) {
+        color = texture(colorTexture, h.t.pq);
+        p.y = -groundDistance;
+        n = vec4(0.0, 1.0, 0.0, 0.0);
+    } else {
+        color = interpolateColor(h);
+        n = interpolateNormal(h);
+    }
+}
+
+
+struct trace_state_t
+{
+    vec4 origin;  // start of ray
+    vec4 dir;     // direction
+    vec4 color;   // color after multiple bounces
+    vec4 localColor;   // color of the material (after interpolation)
+    hitinfo_t h;  // what the ray hits (triangle Id, u, v, lambda)
+    vec4 hit;     // point the ray hits 
+    vec4 Ld;      // direction to light at destination
+    vec4 N;       // normal at destination
+};
+
+vec4 trace(vec4 origin, vec4 dir)
+{
+    // These variables are for TP2
+    trace_state_t stack[MAX_TRACE + 1];
+    bool fallback[MAX_TRACE + 1];
+    int sp = 0;
+    vec4 neworigin = origin;
+    vec4 newdir = dir;
+
+    for (int i = 0; i< MAX_TRACE + 1; i++){
+        trace_state_t state;
+        vec4 p;
+        vec4 localColor;
+        vec4 N;
+        hitinfo_t hits;
+        state.dir = newdir;
+        state.origin = neworigin;
+        if (firstIntersection(neworigin, newdir, hits)){
+    		getLocal(neworigin, newdir, hits, localColor, p, N);
+            state.color = vec4(0, 0, 0, 0);
+            state.Ld = normalize(vec4(lightPosition, 1) - p);
+            state.localColor = localColor;
+            state.h = hits;
+            state.N = N;
+            state.hit = p;
+            newdir = newdir - 2 *dot(newdir, N) * N;
+            neworigin = p;
+            stack[i] = state;
+        }
+        else{
+            if (i>0){
+                stack[i-1].color = directIllumination(stack[i-1].localColor, stack[i-1].hit, stack[i-1].N, -stack[i-1].dir);
+            }
+            stack[i] = state;
+            break;
+        }
+        sp++;
+    }
+    if (sp == MAX_TRACE){
+        stack[sp].color = directIllumination(stack[sp].localColor, stack[sp].hit, stack[sp].N, -stack[sp].dir);
+        sp++;
+    }
+
+    for (int i = sp; i > 0 ; i--){
+        float costheta = dot(-normalize(stack[i-1].dir), normalize(stack[i-1].N));
+        stack[i-1].color = stack[i].color * ftheta(costheta) + directIllumination(stack[i-1].localColor, stack[i-1].hit, stack[i-1].N, -stack[i-1].dir);
+    } 
+    if(sp>1){
+        return stack[0].color;
+    }
+
+	// These are for TP1:
+    hitinfo_t hl;
+    vec4 hit;
+    vec4 localColor;
+    vec4 N;
+
+    float specular_factor, LdN;
+
+	if (firstIntersection(origin, dir, hl)) {
+		getLocal(origin, dir, hl, localColor, hit, N);
+		return directIllumination(localColor, hit, N, -dir);
+	}
+
+    return vec4(0, 0, 0, 1);
+}
+
+// Gold Noise ©2015 dcerisano@standard3d.com
+// - based on the Golden Ratio
+// - uniform normalized distribution
+// - fastest static noise generator function (also runs at low precision)
+// - use with indicated fractional seeding method. 
+
+float PHI = 1.61803398874989484820459;  // Φ = Golden Ratio   
+
+float gold_noise(in vec2 xy, in float seed){
+       return fract(tan(distance(xy*PHI, xy)*seed)*xy.x);
+}
+
+layout (local_size_x = 8, local_size_y = 8) in;
+void main(void) {
+	// Convert local screen coordinates into world coordinates
+    ivec2 pix = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = imageSize(framebuffer);
+    if (pix.x >= size.x || pix.y >= size.y) {
+        return;
+    }
+
+    vec2 float_pix = pix;
+    float_pix.x += haltonx[counter%256];
+    float_pix.y += haltony[counter%256];
+    
+    vec2 pos = float_pix / size;
+    // pos in [0,1]^2 Need it in [-1,1]^2:
+    pos = 2 * pos - vec2(1., 1.);
+
+    // Step 1: I need pixel coordinates.
+    vec4 worldPos = vec4(pos.x, pos.y, 1.0, 1.0);
+    worldPos = persp_inverse * worldPos;
+    worldPos /= worldPos.w;
+    worldPos.w = 0;
+    worldPos = normalize(worldPos);
+    // Step 2: ray direction:
+    vec4 dir = normalize((mat_inverse * worldPos));
+    vec4 eye = (mat_inverse * vec4(0, 0, 0, 1));
+    vec4 color = trace(eye, dir);
+
+    vec4 start_color = imageLoad(framebuffer, pix);
+    color = (start_color * counter + color)/(counter + 1);
+
+
+    imageStore(framebuffer, pix, color);
+}
