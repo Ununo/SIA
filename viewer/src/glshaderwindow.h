@@ -47,6 +47,8 @@ public slots:
     void updateLightIntensity(int lightSliderValue);
     void updateShininess(int shininessSliderValue);
     void updateEta(int etaSliderValue);
+    void normalMappingEnabled();
+    void normalMappingDisabled();
 
 protected:
     void mousePressEvent(QMouseEvent *e);
@@ -104,7 +106,7 @@ private:
     float shininess;
     float lightDistance;
     float groundDistance;
-
+    bool normalMap;
 
     // OpenGL variables encapsulated by Qt
     QOpenGLShaderProgram *m_program;
@@ -153,6 +155,8 @@ private:
     QWidget* container;
     QTimer* timer;
     int counter;
+
+    
 };
 
 #endif // GLSHADERWINDOW_H

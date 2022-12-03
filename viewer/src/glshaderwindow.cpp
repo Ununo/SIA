@@ -30,7 +30,7 @@ glShaderWindow::glShaderWindow(QWindow *parent)
       g_vertices(0), g_normals(0), g_texcoords(0), g_colors(0), g_indices(0),
       gpgpu_vertices(0), gpgpu_normals(0), gpgpu_texcoords(0), gpgpu_colors(0), gpgpu_indices(0),
       environmentMap(0), texture(0), permTexture(0), pixels(0), mouseButton(Qt::NoButton), auxWidget(0),
-      isGPGPU(true), hasComputeShaders(true), blinnPhong(true), transparent(true), eta(1.5), lightIntensity(1.0f), shininess(50.0f), lightDistance(5.0f), groundDistance(0.78),
+      isGPGPU(true), hasComputeShaders(true), blinnPhong(true), transparent(true), eta(1.5), lightIntensity(1.0f), shininess(50.0f), lightDistance(5.0f), groundDistance(0.78),normalMap(false),
       shadowMap_fboId(0), shadowMap_rboId(0), shadowMap_textureId(0), fullScreenSnapshots(false), computeResult(0), 
       m_indexBuffer(QOpenGLBuffer::IndexBuffer), ground_indexBuffer(QOpenGLBuffer::IndexBuffer)
 {
@@ -218,6 +218,19 @@ void glShaderWindow::updateEta(int etaSliderValue)
     renderNow();
 }
 
+void normalMappingEnabled()
+{
+    normalMap = true;
+    renderNow();
+}
+
+void normalMappingDisabled()
+{
+    normalMap = false;
+    renderNow();
+}
+
+
 QWidget *glShaderWindow::makeAuxWindow()
 {
     if (auxWidget)
@@ -253,7 +266,6 @@ QWidget *glShaderWindow::makeAuxWindow()
     vbox2->addWidget(transparent2);
     groupBox2->setLayout(vbox2);
     buttons->addWidget(groupBox2);
-    outer->addLayout(buttons);
 
     // light source intensity
     QSlider* lightSlider = new QSlider(Qt::Horizontal);
@@ -307,6 +319,20 @@ QWidget *glShaderWindow::makeAuxWindow()
     outer->addLayout(hboxEta);
     outer->addWidget(etaSlider);
 
+    // Normal Mapping radio button
+    QGroupBox* normalMappingBox = new QGroupBox("Normal Maps :");
+    QRadioButton* nmEnabled = new QRadioButton("&Enabled");
+    QRadioButton* nmDisabled = new QRadioButton("&Disabled");
+    if (normalMap) nmEnabled->setChecked(true);
+    else nmDisabled->setChecked(true);
+    connect(nmEnabled, SIGNAL(clicked()), this, SLOT(normalMappingEnabled()));
+    connect(nmDisabled, SIGNAL(clicked()), this, SLOT(normalMappingDisabled()));
+    QVBoxLayout* nmBoxLayout = new QVBoxLayout;
+    nmBoxLayout->addWidget(nmEnabled);
+    nmBoxLayout->addWidget(nmDisabled);
+    normalMappingBox->setLayout(nmBoxLayout);
+    buttons-> addWidget(normalMappingBox);
+    outer-> addWidget(buttons);
     auxWidget->setLayout(outer);
     return auxWidget;
 }
