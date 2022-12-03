@@ -448,9 +448,9 @@ vec4 trace(vec4 origin, vec4 dir)
         hitinfo_t hits;
         state.dir = newdir;
         state.origin = neworigin;
+        state.color = vec4(0, 0, 0, 1);
         if (firstIntersection(neworigin, newdir, hits)){
     		getLocal(neworigin, newdir, hits, localColor, p, N);
-            state.color = vec4(0, 0, 0, 0);
             state.Ld = normalize(vec4(lightPosition, 1) - p);
             state.localColor = localColor;
             state.h = hits;
@@ -471,7 +471,6 @@ vec4 trace(vec4 origin, vec4 dir)
     }
     if (sp == MAX_TRACE){
         stack[sp].color = directIllumination(stack[sp].localColor, stack[sp].hit, stack[sp].N, -stack[sp].dir);
-        sp++;
     }
 
     for (int i = sp; i > 0 ; i--){
@@ -479,7 +478,7 @@ vec4 trace(vec4 origin, vec4 dir)
         stack[i-1].color = stack[i].color * ftheta(costheta) + directIllumination(stack[i-1].localColor, stack[i-1].hit, stack[i-1].N, -stack[i-1].dir);
     } 
     if(sp>1){
-        return stack[0].color;
+        return vec4(stack[0].color.xyz, 1);
     }
 
 	// These are for TP1:
