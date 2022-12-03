@@ -218,30 +218,30 @@ void glShaderWindow::updateEta(int etaSliderValue)
     renderNow();
 }
 
-void normalMappingEnabled()
+void glShaderWindow::normalMappingEnabled()
 {
     normalMap = true;
     renderNow();
 }
 
-void normalMappingDisabled()
+void glShaderWindow::normalMappingDisabled()
 {
     normalMap = false;
     renderNow();
 }
 
 
-void enableProcedural() {
+void glShaderWindow::enableProcedural() {
     procedural = true;
     renderNow();
 }
 
-void disableProcedural() {
+void glShaderWindow::disableProcedural() {
     procedural = false;
     renderNow();
 }
 
-QWidget *glShaderWindow::makeAuxWindow()
+QWidget * glShaderWindow::makeAuxWindow()
 {
     if (auxWidget)
         if (auxWidget->isVisible()) return auxWidget;
@@ -249,7 +249,7 @@ QWidget *glShaderWindow::makeAuxWindow()
 
     QVBoxLayout *outer = new QVBoxLayout;
     QHBoxLayout *buttons = new QHBoxLayout;
-    QHboxLayout* advanced = new QHBoxLayout;
+    QHBoxLayout *advanced = new QHBoxLayout;
 
     QGroupBox *groupBox = new QGroupBox("Specular Model selection");
     QRadioButton *radio1 = new QRadioButton("Blinn-Phong");
@@ -356,10 +356,10 @@ QWidget *glShaderWindow::makeAuxWindow()
     proceduralBoxLayout->addWidget(proceduralEnabled);
     proceduralBoxLayout->addWidget(proceduralDisabled);
     proceduralBox->setLayout(proceduralBoxLayout);
-    advanced->addWidget(proceduralBox)
+    advanced->addWidget(proceduralBox);
 
-    outer->addWidget(advanced);
-    outer-> addWidget(buttons);
+    outer->addLayout(advanced);
+    outer->addLayout(buttons);
     auxWidget->setLayout(outer);
     return auxWidget;
 }
