@@ -49,6 +49,8 @@ public slots:
     void updateEta(int etaSliderValue);
     void normalMappingEnabled();
     void normalMappingDisabled();
+    void enableProcedural();
+    void disableProcedural();
 
 protected:
     void mousePressEvent(QMouseEvent *e);
@@ -107,6 +109,7 @@ private:
     float lightDistance;
     float groundDistance;
     bool normalMap;
+    bool procedural;
 
     // OpenGL variables encapsulated by Qt
     QOpenGLShaderProgram *m_program;

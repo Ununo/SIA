@@ -30,7 +30,7 @@ glShaderWindow::glShaderWindow(QWindow *parent)
       g_vertices(0), g_normals(0), g_texcoords(0), g_colors(0), g_indices(0),
       gpgpu_vertices(0), gpgpu_normals(0), gpgpu_texcoords(0), gpgpu_colors(0), gpgpu_indices(0),
       environmentMap(0), texture(0), permTexture(0), pixels(0), mouseButton(Qt::NoButton), auxWidget(0),
-      isGPGPU(true), hasComputeShaders(true), blinnPhong(true), transparent(true), eta(1.5), lightIntensity(1.0f), shininess(50.0f), lightDistance(5.0f), groundDistance(0.78),normalMap(false),
+      isGPGPU(true), hasComputeShaders(true), blinnPhong(true), transparent(true), eta(1.5), lightIntensity(1.0f), shininess(50.0f), lightDistance(5.0f), groundDistance(0.78),normalMap(false),procedural(false),
       shadowMap_fboId(0), shadowMap_rboId(0), shadowMap_textureId(0), fullScreenSnapshots(false), computeResult(0), 
       m_indexBuffer(QOpenGLBuffer::IndexBuffer), ground_indexBuffer(QOpenGLBuffer::IndexBuffer)
 {
@@ -231,6 +231,16 @@ void normalMappingDisabled()
 }
 
 
+void enableProcedural() {
+    procedural = true;
+    renderNow();
+}
+
+void disableProcedural() {
+    procedural = false;
+    renderNow();
+}
+
 QWidget *glShaderWindow::makeAuxWindow()
 {
     if (auxWidget)
@@ -239,6 +249,7 @@ QWidget *glShaderWindow::makeAuxWindow()
 
     QVBoxLayout *outer = new QVBoxLayout;
     QHBoxLayout *buttons = new QHBoxLayout;
+    QHboxLayout* advanced = new QHBoxLayout;
 
     QGroupBox *groupBox = new QGroupBox("Specular Model selection");
     QRadioButton *radio1 = new QRadioButton("Blinn-Phong");
@@ -331,7 +342,23 @@ QWidget *glShaderWindow::makeAuxWindow()
     nmBoxLayout->addWidget(nmEnabled);
     nmBoxLayout->addWidget(nmDisabled);
     normalMappingBox->setLayout(nmBoxLayout);
-    buttons-> addWidget(normalMappingBox);
+    advanced-> addWidget(normalMappingBox);
+
+    // Procedural texturing radio buttons
+    QGroupBox* proceduralBox = new QGroupBox("Procedural textures :");
+    QRadioButton* proceduralEnabled = new QRadioButton("&Enabled");
+    QRadioButton* proceduralDisabled = new QRadioButton("&Disabled");
+    if (procedural) proceduralEnabled->setChecked(true);
+    else proceduralDisabled->setChecked(false);
+    connect(proceduralEnabled, SIGNAL(clicked()), this, SLOT(enableProcedural()));
+    connect(proceduralDisabled, SIGNAL(clicked()), this, SLOT(disableProcedural()));
+    QVBoxLayout* proceduralBoxLayout = new QVBoxLayout;
+    proceduralBoxLayout->addWidget(proceduralEnabled);
+    proceduralBoxLayout->addWidget(proceduralDisabled);
+    proceduralBox->setLayout(proceduralBoxLayout);
+    advanced->addWidget(proceduralBox)
+
+    outer->addWidget(advanced);
     outer-> addWidget(buttons);
     auxWidget->setLayout(outer);
     return auxWidget;
@@ -1073,6 +1100,8 @@ void glShaderWindow::render()
         compute_program->setUniformValue("framebuffer", 2);
         compute_program->setUniformValue("colorTexture", 0);
         compute_program->setUniformValue("counter", counter);
+        compute_program->setUniformValue("normalMapping", normalMap);
+        compute_program->setUniformValue("procedural",procedural);
 		glBindImageTexture(2, computeResult->textureId(), 0, false, 0, GL_WRITE_ONLY, GL_RGBA32F);
         int worksize_x = nextPower2(width());
         int worksize_y = nextPower2(height());
