@@ -51,6 +51,18 @@ public slots:
     void normalMappingDisabled();
     void enableProcedural();
     void disableProcedural();
+    void updateProcColor1R(int param);
+    void updateProcColor1G(int param);
+    void updateProcColor1B(int param);
+    void updateProcColor2R(int param);
+    void updateProcColor2G(int param);
+    void updateProcColor2B(int param);
+    void updateProcColor3R(int param);
+    void updateProcColor3G(int param);
+    void updateProcColor3B(int param);
+    void updatePeriode1(int param);
+    void updatePeriode2(int param);
+
 
 protected:
     void mousePressEvent(QMouseEvent *e);
@@ -158,6 +170,13 @@ private:
     QWidget* container;
     QTimer* timer;
     int counter;
+
+    QVector3D procColor1;
+    QVector3D procColor2;
+    QVector3D procColor3;
+
+    int periode1;
+    int periode2;
 
     
 };
