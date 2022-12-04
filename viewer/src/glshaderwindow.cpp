@@ -349,7 +349,7 @@ QWidget * glShaderWindow::makeAuxWindow()
     QRadioButton* proceduralEnabled = new QRadioButton("&Enabled");
     QRadioButton* proceduralDisabled = new QRadioButton("&Disabled");
     if (procedural) proceduralEnabled->setChecked(true);
-    else proceduralDisabled->setChecked(false);
+    else proceduralDisabled->setChecked(true);
     connect(proceduralEnabled, SIGNAL(clicked()), this, SLOT(enableProcedural()));
     connect(proceduralDisabled, SIGNAL(clicked()), this, SLOT(disableProcedural()));
     QVBoxLayout* proceduralBoxLayout = new QVBoxLayout;
