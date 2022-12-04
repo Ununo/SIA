@@ -33,6 +33,7 @@ glShaderWindow::glShaderWindow(QWindow *parent)
       gpgpu_vertices(0), gpgpu_normals(0), gpgpu_texcoords(0), gpgpu_colors(0), gpgpu_indices(0),
       environmentMap(0), texture(0), permTexture(0), pixels(0), mouseButton(Qt::NoButton), auxWidget(0),
       isGPGPU(true), hasComputeShaders(true), blinnPhong(true), transparent(true), eta(1.5), lightIntensity(1.0f), shininess(50.0f), lightDistance(5.0f), groundDistance(0.78),normalMap(false),procedural(false),
+      procColor1(1, 1, 1), procColor2(1, 0, 0), procColor3(1, 1, 0), periode1(10), periode2(20),
       shadowMap_fboId(0), shadowMap_rboId(0), shadowMap_textureId(0), fullScreenSnapshots(false), computeResult(0), 
       m_indexBuffer(QOpenGLBuffer::IndexBuffer), ground_indexBuffer(QOpenGLBuffer::IndexBuffer)
 {
@@ -202,119 +203,141 @@ void glShaderWindow::openNewEnvMap() {
 
 void glShaderWindow::cookTorranceClicked()
 {
+    counter = 0;
     blinnPhong = false;
     renderNow();
 }
 
 void glShaderWindow::blinnPhongClicked()
 {
+    counter = 0;
     blinnPhong = true;
     renderNow();
 }
 
 void glShaderWindow::transparentClicked()
 {
+    counter = 0;
     transparent = true;
     renderNow();
 }
 
 void glShaderWindow::opaqueClicked()
 {
+    counter = 0;
     transparent = false;
     renderNow();
 }
 
 void glShaderWindow::updateLightIntensity(int lightSliderValue)
 {
+    counter = 0;
     lightIntensity = lightSliderValue / 100.0;
     renderNow();
 }
 
 void glShaderWindow::updateShininess(int shininessSliderValue)
 {
+    counter = 0;
     shininess = shininessSliderValue;
     renderNow();
 }
 
 void glShaderWindow::updateEta(int etaSliderValue)
 {
+    counter = 0;
     eta = etaSliderValue/100.0;
     renderNow();
 }
 
 void glShaderWindow::normalMappingEnabled()
 {
+    counter = 0;
     normalMap = true;
     renderNow();
 }
 
 void glShaderWindow::normalMappingDisabled()
 {
+    counter = 0;
     normalMap = false;
     renderNow();
 }
 
 
 void glShaderWindow::enableProcedural() {
+    counter = 0;
     procedural = true;
     renderNow();
 }
 
 void glShaderWindow::disableProcedural() {
+    counter = 0;
     procedural = false;
     renderNow();
 }
 
 void glShaderWindow::updateProcColor1R(int param) {
+    counter = 0;
     procColor1.setX(((float) param)/255);
     renderNow();
 }
 
 void glShaderWindow::updateProcColor1G(int param) {
+    counter = 0;
     procColor1.setY(((float) param)/255);
     renderNow();
 }
 
 void glShaderWindow::updateProcColor1B(int param) {
+    counter = 0;
     procColor1.setZ(((float) param)/255);
     renderNow();
 }
 
 void glShaderWindow::updateProcColor2R(int param) {
-    procColor1.setX(((float) param)/255);
+    counter = 0;
+    procColor2.setX(((float) param)/255);
     renderNow();
 }
 
 void glShaderWindow::updateProcColor2G(int param) {
-    procColor1.setY(((float) param)/255);
+    counter = 0;
+    procColor2.setY(((float) param)/255);
     renderNow();
 }
 
 void glShaderWindow::updateProcColor2B(int param) {
-    procColor1.setZ(((float) param)/255);
+    counter = 0;
+    procColor2.setZ(((float) param)/255);
     renderNow();
 }
 void glShaderWindow::updateProcColor3R(int param) {
-    procColor1.setX(((float) param)/255);
+    counter = 0;
+    procColor3.setX(((float) param)/255);
     renderNow();
 }
 
 void glShaderWindow::updateProcColor3G(int param) {
-    procColor1.setY(((float) param)/255);
+    counter = 0;
+    procColor3.setY(((float) param)/255);
     renderNow();
 }
 
 void glShaderWindow::updateProcColor3B(int param) {
-    procColor1.setZ(((float) param)/255);
+    counter = 0;
+    procColor3.setZ(((float) param)/255);
     renderNow();
 }
 
 void glShaderWindow::updatePeriode1(int param) {
+    counter = 0;
     periode1 = param;
     renderNow();
 }
 
 void glShaderWindow::updatePeriode2(int param) {
+    counter = 0;
     periode2 = param;
     renderNow();
 }
@@ -444,19 +467,19 @@ QWidget * glShaderWindow::makeAuxWindow()
     procColor1R->setTickInterval(51);
     procColor1R->setMinimum(0);
     procColor1R->setMaximum(255);
-    procColor1R->setSliderPosition(0);
+    procColor1R->setSliderPosition(255);
     QSlider* procColor1G = new QSlider(Qt::Horizontal);
     procColor1G->setTickPosition(QSlider::TicksBelow);
     procColor1G->setTickInterval(51);
     procColor1G->setMinimum(0);
     procColor1G->setMaximum(255);
-    procColor1G->setSliderPosition(0);
+    procColor1G->setSliderPosition(255);
     QSlider* procColor1B = new QSlider(Qt::Horizontal);
     procColor1B->setTickPosition(QSlider::TicksBelow);
     procColor1B->setTickInterval(51);
     procColor1B->setMinimum(0);
     procColor1B->setMaximum(255);
-    procColor1B->setSliderPosition(0);
+    procColor1B->setSliderPosition(255);
     connect(procColor1R, SIGNAL(valueChanged(int)),this,SLOT(updateProcColor1R(int)));
     connect(procColor1G, SIGNAL(valueChanged(int)),this,SLOT(updateProcColor1G(int)));
     connect(procColor1B, SIGNAL(valueChanged(int)),this,SLOT(updateProcColor1B(int)));
@@ -467,9 +490,9 @@ QWidget * glShaderWindow::makeAuxWindow()
     QLabel* pc1RValue = new QLabel();
     QLabel* pc1GValue = new QLabel();
     QLabel* pc1BValue = new QLabel();
-    pc1RValue->setNum(0);
-    pc1GValue->setNum(0);
-    pc1BValue->setNum(0);
+    pc1RValue->setNum(255);
+    pc1GValue->setNum(255);
+    pc1BValue->setNum(255);
     connect(procColor1R, SIGNAL(valueChanged(int)),pc1RValue, SLOT(setNum(int)));
     connect(procColor1G, SIGNAL(valueChanged(int)),pc1GValue, SLOT(setNum(int)));
     connect(procColor1B, SIGNAL(valueChanged(int)),pc1BValue, SLOT(setNum(int)));
@@ -500,7 +523,7 @@ QWidget * glShaderWindow::makeAuxWindow()
     procColor2R->setTickInterval(51);
     procColor2R->setMinimum(0);
     procColor2R->setMaximum(255);
-    procColor2R->setSliderPosition(0);
+    procColor2R->setSliderPosition(255);
     QSlider* procColor2G = new QSlider(Qt::Horizontal);
     procColor2G->setTickPosition(QSlider::TicksBelow);
     procColor2G->setTickInterval(51);
@@ -523,7 +546,7 @@ QWidget * glShaderWindow::makeAuxWindow()
     QLabel* pc2RValue = new QLabel();
     QLabel* pc2GValue = new QLabel();
     QLabel* pc2BValue = new QLabel();
-    pc2RValue->setNum(0);
+    pc2RValue->setNum(255);
     pc2GValue->setNum(0);
     pc2BValue->setNum(0);
     connect(procColor2R, SIGNAL(valueChanged(int)),pc2RValue, SLOT(setNum(int)));
@@ -554,13 +577,13 @@ QWidget * glShaderWindow::makeAuxWindow()
     procColor3R->setTickInterval(51);
     procColor3R->setMinimum(0);
     procColor3R->setMaximum(255);
-    procColor3R->setSliderPosition(0);
+    procColor3R->setSliderPosition(255);
     QSlider* procColor3G = new QSlider(Qt::Horizontal);
     procColor3G->setTickPosition(QSlider::TicksBelow);
     procColor3G->setTickInterval(51);
     procColor3G->setMinimum(0);
     procColor3G->setMaximum(255);
-    procColor3G->setSliderPosition(0);
+    procColor3G->setSliderPosition(255);
     QSlider* procColor3B = new QSlider(Qt::Horizontal);
     procColor3B->setTickPosition(QSlider::TicksBelow);
     procColor3B->setTickInterval(51);
@@ -577,8 +600,8 @@ QWidget * glShaderWindow::makeAuxWindow()
     QLabel* pc3RValue = new QLabel();
     QLabel* pc3GValue = new QLabel();
     QLabel* pc3BValue = new QLabel();
-    pc3RValue->setNum(0);
-    pc3GValue->setNum(0);
+    pc3RValue->setNum(255);
+    pc3GValue->setNum(255);
     pc3BValue->setNum(0);
     connect(procColor3R, SIGNAL(valueChanged(int)),pc3RValue, SLOT(setNum(int)));
     connect(procColor3G, SIGNAL(valueChanged(int)),pc3GValue, SLOT(setNum(int)));
@@ -606,8 +629,8 @@ QWidget * glShaderWindow::makeAuxWindow()
     p1Slider->setTickPosition(QSlider::TicksBelow);
     p1Slider->setTickInterval(1);
     p1Slider->setMinimum(10);
-    p1Slider->setMaximum(50);
-    p1Slider->setSliderPosition(1);
+    p1Slider->setMaximum(100);
+    p1Slider->setSliderPosition(10);
     connect(p1Slider,SIGNAL(valueChanged(int)),this,SLOT(updatePeriode1(int)));
     QLabel* p1Label = new QLabel("Periode1=");
     QLabel* p1LabelValue = new QLabel();
@@ -623,12 +646,12 @@ QWidget * glShaderWindow::makeAuxWindow()
     p2Slider->setTickPosition(QSlider::TicksBelow);
     p2Slider->setTickInterval(1);
     p2Slider->setMinimum(10);
-    p2Slider->setMaximum(50);
-    p2Slider->setSliderPosition(10);
+    p2Slider->setMaximum(100);
+    p2Slider->setSliderPosition(20);
     connect(p2Slider,SIGNAL(valueChanged(int)),this,SLOT(updatePeriode2(int)));
     QLabel* p2Label = new QLabel("Periode 2 =");
     QLabel* p2LabelValue = new QLabel();
-    p2LabelValue->setNum(10);
+    p2LabelValue->setNum(20);
     connect(p2Slider,SIGNAL(valueChanged(int)),p2LabelValue,SLOT(setNum(int)));
     QHBoxLayout *hboxP2= new QHBoxLayout;
     hboxP2->addWidget(p2Label);

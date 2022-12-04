@@ -592,10 +592,6 @@ float turbulence(float x, float y, float z, float size)
 
 int noiseSize = 180;
 
-vec3 base = vec3(1, 1, 1);
-vec3 proc1 = vec3(1, 0, 0);
-vec3 proc2 = vec3(1, 1, 0);
-
 void getLocal(vec4 origin, vec4 dir, hitinfo_t h, out vec4 color, out vec4 p, out vec4 n)
 {
     p = origin + h.t.x * dir;
@@ -611,22 +607,20 @@ void getLocal(vec4 origin, vec4 dir, hitinfo_t h, out vec4 color, out vec4 p, ou
     } else {
         if (procedural){
             //h.t.w + h.t.y + h.t.z
-            float period1 = 20.0;
-            float period2 = 2 * period1;
-            float turbPower1 = 30.0;
+            float turbPower1 = 100.0;
             float turbPower2 = 70.0;
             float turbSize = 128.0;
             vec4 pos = h.t.w * vertices[indices[h.hit_vptr]] + h.t.y * vertices[indices[h.hit_vptr + 1]] + h.t.z * vertices[indices[h.hit_vptr + 2]];
-            float xyzValue1 = pos.x * period1 / noiseSize + pos.y * period1 / noiseSize + pos.z * period1 / noiseSize + turbPower1 * turbulence(pos.x, pos.y, pos.z, turbSize)/256;
-            float xyzValue2 = pos.x * period2 / noiseSize + pos.y * period2 / noiseSize + pos.z * period2 / noiseSize + turbPower2 * turbulence(pos.x, pos.y, pos.z, turbSize)/256;
+            float xyzValue1 = pos.x * periode1 / noiseSize + pos.y * periode1 / noiseSize + pos.z * periode1 / noiseSize + turbPower1 * turbulence(pos.x, pos.y, pos.z, turbSize)/256;
+            float xyzValue2 = pos.x * periode2 / noiseSize + pos.y * periode2 / noiseSize + pos.z * periode2 / noiseSize + turbPower2 * turbulence(pos.x, pos.y, pos.z, turbSize)/256;
             float sinNoise1 = (sin(xyzValue1) + 1)/2;
             float sinNoise2 = (sin(xyzValue2) + 1)/2;
             if ((sinNoise1 + sinNoise2)/2 > 0.5){
-                color = vec4((sinNoise1 + sinNoise2)/2* base, 1);
+                color = vec4((sinNoise1 + sinNoise2)/2* proceduralColor1, 1);
             }
             else{
-                color = vec4((1-sinNoise1) * proc1, 1);
-                color += vec4((1-sinNoise2) * proc2, 1);
+                color = vec4((1-sinNoise1) * proceduralColor2, 1);
+                color += vec4((1-sinNoise2) * proceduralColor3, 1);
                 color /= 2;
             }
         }

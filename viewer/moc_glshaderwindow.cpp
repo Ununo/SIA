@@ -21,8 +21,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_glShaderWindow_t {
-    QByteArrayData data[26];
-    char stringdata0[396];
+    QByteArrayData data[38];
+    char stringdata0[594];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -56,7 +56,19 @@ QT_MOC_LITERAL(21, 303, 14), // "etaSliderValue"
 QT_MOC_LITERAL(22, 318, 20), // "normalMappingEnabled"
 QT_MOC_LITERAL(23, 339, 21), // "normalMappingDisabled"
 QT_MOC_LITERAL(24, 361, 16), // "enableProcedural"
-QT_MOC_LITERAL(25, 378, 17) // "disableProcedural"
+QT_MOC_LITERAL(25, 378, 17), // "disableProcedural"
+QT_MOC_LITERAL(26, 396, 17), // "updateProcColor1R"
+QT_MOC_LITERAL(27, 414, 5), // "param"
+QT_MOC_LITERAL(28, 420, 17), // "updateProcColor1G"
+QT_MOC_LITERAL(29, 438, 17), // "updateProcColor1B"
+QT_MOC_LITERAL(30, 456, 17), // "updateProcColor2R"
+QT_MOC_LITERAL(31, 474, 17), // "updateProcColor2G"
+QT_MOC_LITERAL(32, 492, 17), // "updateProcColor2B"
+QT_MOC_LITERAL(33, 510, 17), // "updateProcColor3R"
+QT_MOC_LITERAL(34, 528, 17), // "updateProcColor3G"
+QT_MOC_LITERAL(35, 546, 17), // "updateProcColor3B"
+QT_MOC_LITERAL(36, 564, 14), // "updatePeriode1"
+QT_MOC_LITERAL(37, 579, 14) // "updatePeriode2"
 
     },
     "glShaderWindow\0openSceneFromFile\0\0"
@@ -69,7 +81,12 @@ QT_MOC_LITERAL(25, 378, 17) // "disableProcedural"
     "updateShininess\0shininessSliderValue\0"
     "updateEta\0etaSliderValue\0normalMappingEnabled\0"
     "normalMappingDisabled\0enableProcedural\0"
-    "disableProcedural"
+    "disableProcedural\0updateProcColor1R\0"
+    "param\0updateProcColor1G\0updateProcColor1B\0"
+    "updateProcColor2R\0updateProcColor2G\0"
+    "updateProcColor2B\0updateProcColor3R\0"
+    "updateProcColor3G\0updateProcColor3B\0"
+    "updatePeriode1\0updatePeriode2"
 };
 #undef QT_MOC_LITERAL
 
@@ -79,7 +96,7 @@ static const uint qt_meta_data_glShaderWindow[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-      19,   14, // methods
+      30,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -87,25 +104,36 @@ static const uint qt_meta_data_glShaderWindow[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    0,  109,    2, 0x0a /* Public */,
-       3,    0,  110,    2, 0x0a /* Public */,
-       4,    0,  111,    2, 0x0a /* Public */,
-       5,    0,  112,    2, 0x0a /* Public */,
-       6,    0,  113,    2, 0x0a /* Public */,
-       7,    0,  114,    2, 0x0a /* Public */,
-       8,    0,  115,    2, 0x0a /* Public */,
-      10,    1,  116,    2, 0x0a /* Public */,
-      12,    0,  119,    2, 0x0a /* Public */,
-      13,    0,  120,    2, 0x0a /* Public */,
-      14,    0,  121,    2, 0x0a /* Public */,
-      15,    0,  122,    2, 0x0a /* Public */,
-      16,    1,  123,    2, 0x0a /* Public */,
-      18,    1,  126,    2, 0x0a /* Public */,
-      20,    1,  129,    2, 0x0a /* Public */,
-      22,    0,  132,    2, 0x0a /* Public */,
-      23,    0,  133,    2, 0x0a /* Public */,
-      24,    0,  134,    2, 0x0a /* Public */,
-      25,    0,  135,    2, 0x0a /* Public */,
+       1,    0,  164,    2, 0x0a /* Public */,
+       3,    0,  165,    2, 0x0a /* Public */,
+       4,    0,  166,    2, 0x0a /* Public */,
+       5,    0,  167,    2, 0x0a /* Public */,
+       6,    0,  168,    2, 0x0a /* Public */,
+       7,    0,  169,    2, 0x0a /* Public */,
+       8,    0,  170,    2, 0x0a /* Public */,
+      10,    1,  171,    2, 0x0a /* Public */,
+      12,    0,  174,    2, 0x0a /* Public */,
+      13,    0,  175,    2, 0x0a /* Public */,
+      14,    0,  176,    2, 0x0a /* Public */,
+      15,    0,  177,    2, 0x0a /* Public */,
+      16,    1,  178,    2, 0x0a /* Public */,
+      18,    1,  181,    2, 0x0a /* Public */,
+      20,    1,  184,    2, 0x0a /* Public */,
+      22,    0,  187,    2, 0x0a /* Public */,
+      23,    0,  188,    2, 0x0a /* Public */,
+      24,    0,  189,    2, 0x0a /* Public */,
+      25,    0,  190,    2, 0x0a /* Public */,
+      26,    1,  191,    2, 0x0a /* Public */,
+      28,    1,  194,    2, 0x0a /* Public */,
+      29,    1,  197,    2, 0x0a /* Public */,
+      30,    1,  200,    2, 0x0a /* Public */,
+      31,    1,  203,    2, 0x0a /* Public */,
+      32,    1,  206,    2, 0x0a /* Public */,
+      33,    1,  209,    2, 0x0a /* Public */,
+      34,    1,  212,    2, 0x0a /* Public */,
+      35,    1,  215,    2, 0x0a /* Public */,
+      36,    1,  218,    2, 0x0a /* Public */,
+      37,    1,  221,    2, 0x0a /* Public */,
 
  // slots: parameters
     QMetaType::Void,
@@ -127,6 +155,17 @@ static const uint qt_meta_data_glShaderWindow[] = {
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
+    QMetaType::Void, QMetaType::Int,   27,
+    QMetaType::Void, QMetaType::Int,   27,
+    QMetaType::Void, QMetaType::Int,   27,
+    QMetaType::Void, QMetaType::Int,   27,
+    QMetaType::Void, QMetaType::Int,   27,
+    QMetaType::Void, QMetaType::Int,   27,
+    QMetaType::Void, QMetaType::Int,   27,
+    QMetaType::Void, QMetaType::Int,   27,
+    QMetaType::Void, QMetaType::Int,   27,
+    QMetaType::Void, QMetaType::Int,   27,
+    QMetaType::Void, QMetaType::Int,   27,
 
        0        // eod
 };
@@ -157,6 +196,17 @@ void glShaderWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _
         case 16: _t->normalMappingDisabled(); break;
         case 17: _t->enableProcedural(); break;
         case 18: _t->disableProcedural(); break;
+        case 19: _t->updateProcColor1R((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 20: _t->updateProcColor1G((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 21: _t->updateProcColor1B((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 22: _t->updateProcColor2R((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 23: _t->updateProcColor2G((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 24: _t->updateProcColor2B((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 25: _t->updateProcColor3R((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 26: _t->updateProcColor3G((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 27: _t->updateProcColor3B((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 28: _t->updatePeriode1((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 29: _t->updatePeriode2((*reinterpret_cast< int(*)>(_a[1]))); break;
         default: ;
         }
     }
@@ -191,13 +241,13 @@ int glShaderWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 19)
+        if (_id < 30)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 19;
+        _id -= 30;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 19)
+        if (_id < 30)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 19;
+        _id -= 30;
     }
     return _id;
 }
