@@ -48,7 +48,7 @@ glShaderWindow::glShaderWindow(QWindow *parent)
 
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, [&](){glShaderWindow::timerEvent(nullptr);});
-    timer->start(200);
+    timer->start(500);
 }
 
 glShaderWindow::~glShaderWindow()
@@ -144,6 +144,28 @@ void glShaderWindow::openNewTexture() {
 				texture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
 				texture->setMagnificationFilter(QOpenGLTexture::Linear);
 				texture->bind(0);
+            }
+        }
+        QStringList list = textureName.split(".");
+        normalTextureName = list.at(0) + "_normal." + list.at(1);
+        if (normalTexture) {
+            normalTexture->release();
+            normalTexture->destroy();
+            delete normalTexture;
+            normalTexture = 0;
+        }
+        if (!normalTextureName.isNull()) {
+			glActiveTexture(GL_TEXTURE3);
+			// the shader wants a texture. We load one.
+            QImage normalImage = QImage(normalTextureName);
+            if (!normalImage.isNull()){
+                normalTexture = new QOpenGLTexture(normalImage);
+                if (normalTexture) {
+                    normalTexture->setWrapMode(QOpenGLTexture::Repeat);
+                    normalTexture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
+                    normalTexture->setMagnificationFilter(QOpenGLTexture::Linear);
+                    normalTexture->bind(3);
+                }
             }
         }
         renderNow();
@@ -692,6 +714,12 @@ void glShaderWindow::loadTexturesForShaders() {
         delete texture;
         texture = 0;
     }
+    if (normalTexture){
+        normalTexture->release();
+        normalTexture->destroy();
+        delete normalTexture;
+        normalTexture = 0;
+    }
     if (permTexture) {
         permTexture->release();
         permTexture->destroy();
@@ -1099,6 +1127,7 @@ void glShaderWindow::render()
         compute_program->setUniformValue("eta", eta);
         compute_program->setUniformValue("framebuffer", 2);
         compute_program->setUniformValue("colorTexture", 0);
+        compute_program->setUniformValue("normalTexture", 3);
         compute_program->setUniformValue("counter", counter);
         compute_program->setUniformValue("normalMapping", normalMap);
         compute_program->setUniformValue("procedural",procedural);

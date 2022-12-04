@@ -79,6 +79,7 @@ private:
     QString  workingDirectory;
     QString  modelName;
     QString  textureName;
+    QString  normalTextureName;
     QString  envMapName;
     trimesh::TriMesh* modelMesh;
     uchar* pixels;
@@ -118,6 +119,7 @@ private:
     QOpenGLShaderProgram *shadowMapGenerationProgram;
     QOpenGLTexture* environmentMap;
     QOpenGLTexture* texture;
+    QOpenGLTexture* normalTexture;
     QOpenGLTexture* permTexture;   // for Perlin noise
     QOpenGLTexture* computeResult; // output of compute shader
     // Model

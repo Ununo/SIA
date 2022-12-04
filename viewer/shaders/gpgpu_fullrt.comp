@@ -3,6 +3,7 @@
 layout(binding = 2, rgba32f) uniform image2D framebuffer;
 
 uniform sampler2D colorTexture;
+uniform sampler2D normalTexture;
 uniform mat4 mat_inverse;
 uniform mat4 persp_inverse;
 uniform float lightIntensity;
@@ -460,8 +461,6 @@ vec4 directIllumination(vec4 color, vec4 p, vec4 n, vec4 v)
 	return ca + cd + cs;
 }
 
-const int MAX_TRACE = 3;
-
 // Gold Noise ©2015 dcerisano@standard3d.com
 // - based on the Golden Ratio
 // - uniform normalized distribution
@@ -477,9 +476,9 @@ float gold_noise(in vec2 xy, in float seed){
 // 3D simplex noise
 float snoise3(float x, float y, float z) {
 
-// Simple skewing factors for the 3D case
-#define F3 0.333333333
-#define G3 0.166666667
+    // Simple skewing factors for the 3D case
+    #define F3 0.333333333
+    #define G3 0.166666667
 
     float n0, n1, n2, n3; // Noise contributions from the four corners
 
@@ -598,24 +597,33 @@ void getLocal(vec4 origin, vec4 dir, hitinfo_t h, out vec4 color, out vec4 p, ou
     if (h.hit_vptr == GROUND_VPTR) {
         color = texture(colorTexture, h.t.pq);
         p.y = -groundDistance;
-        n = vec4(0.0, 1.0, 0.0, 0.0);
+        if (normalMapping){
+            n = texture(normalTexture, h.t.pq);
+        }
+        else{
+            n = vec4(0.0, 1.0, 0.0, 0.0);
+        }
     } else {
         if (procedural){
             //h.t.w + h.t.y + h.t.z
-            float period1 = 10.0;
-            float period2 = 20.0;
+            float period1 = 20.0;
+            float period2 = 2 * period1;
             float turbPower1 = 30.0;
-            float turbPower2 = 50.0;
+            float turbPower2 = 70.0;
             float turbSize = 128.0;
             vec4 pos = h.t.w * vertices[indices[h.hit_vptr]] + h.t.y * vertices[indices[h.hit_vptr + 1]] + h.t.z * vertices[indices[h.hit_vptr + 2]];
             float xyzValue1 = pos.x * period1 / noiseSize + pos.y * period1 / noiseSize + pos.z * period1 / noiseSize + turbPower1 * turbulence(pos.x, pos.y, pos.z, turbSize)/256;
             float xyzValue2 = pos.x * period2 / noiseSize + pos.y * period2 / noiseSize + pos.z * period2 / noiseSize + turbPower2 * turbulence(pos.x, pos.y, pos.z, turbSize)/256;
             float sinNoise1 = (sin(xyzValue1) + 1)/2;
             float sinNoise2 = (sin(xyzValue2) + 1)/2;
-            color = vec4(base, 1);
-            color += vec4(sinNoise1 * proc1, 1);
-            color += vec4(sinNoise2 * proc2, 1);
-            color /=3;
+            if ((sinNoise1 + sinNoise2)/2 > 0.5){
+                color = vec4((sinNoise1 + sinNoise2)/2* base, 1);
+            }
+            else{
+                color = vec4((1-sinNoise1) * proc1, 1);
+                color += vec4((1-sinNoise2) * proc2, 1);
+                color /= 2;
+            }
         }
         else{
             color = interpolateColor(h);
@@ -636,6 +644,8 @@ struct trace_state_t
     vec4 Ld;      // direction to light at destination
     vec4 N;       // normal at destination
 };
+
+const int MAX_TRACE = 15;
 
 vec4 trace(vec4 origin, vec4 dir)
 {
