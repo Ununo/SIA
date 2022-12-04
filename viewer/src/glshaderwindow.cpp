@@ -23,6 +23,8 @@
 #include "bvh/bvh.hpp"
 #include "bvh/triangle.hpp"
 
+#include <iostream>
+
 glShaderWindow::glShaderWindow(QWindow *parent)
 // Initialize obvious default values here (e.g. 0 for pointers)
     : OpenGLWindow(parent), modelMesh(0),
@@ -263,6 +265,60 @@ void glShaderWindow::disableProcedural() {
     renderNow();
 }
 
+void glShaderWindow::updateProcColor1R(int param) {
+    procColor1.setX(((float) param)/255);
+    renderNow();
+}
+
+void glShaderWindow::updateProcColor1G(int param) {
+    procColor1.setY(((float) param)/255);
+    renderNow();
+}
+
+void glShaderWindow::updateProcColor1B(int param) {
+    procColor1.setZ(((float) param)/255);
+    renderNow();
+}
+
+void glShaderWindow::updateProcColor2R(int param) {
+    procColor1.setX(((float) param)/255);
+    renderNow();
+}
+
+void glShaderWindow::updateProcColor2G(int param) {
+    procColor1.setY(((float) param)/255);
+    renderNow();
+}
+
+void glShaderWindow::updateProcColor2B(int param) {
+    procColor1.setZ(((float) param)/255);
+    renderNow();
+}
+void glShaderWindow::updateProcColor3R(int param) {
+    procColor1.setX(((float) param)/255);
+    renderNow();
+}
+
+void glShaderWindow::updateProcColor3G(int param) {
+    procColor1.setY(((float) param)/255);
+    renderNow();
+}
+
+void glShaderWindow::updateProcColor3B(int param) {
+    procColor1.setZ(((float) param)/255);
+    renderNow();
+}
+
+void glShaderWindow::updatePeriode1(int param) {
+    periode1 = param;
+    renderNow();
+}
+
+void glShaderWindow::updatePeriode2(int param) {
+    periode2 = param;
+    renderNow();
+}
+
 QWidget * glShaderWindow::makeAuxWindow()
 {
     if (auxWidget)
@@ -382,6 +438,204 @@ QWidget * glShaderWindow::makeAuxWindow()
 
     outer->addLayout(advanced);
     outer->addLayout(buttons);
+
+    QSlider* procColor1R = new QSlider(Qt::Horizontal);
+    procColor1R->setTickPosition(QSlider::TicksBelow);
+    procColor1R->setTickInterval(51);
+    procColor1R->setMinimum(0);
+    procColor1R->setMaximum(255);
+    procColor1R->setSliderPosition(0);
+    QSlider* procColor1G = new QSlider(Qt::Horizontal);
+    procColor1G->setTickPosition(QSlider::TicksBelow);
+    procColor1G->setTickInterval(51);
+    procColor1G->setMinimum(0);
+    procColor1G->setMaximum(255);
+    procColor1G->setSliderPosition(0);
+    QSlider* procColor1B = new QSlider(Qt::Horizontal);
+    procColor1B->setTickPosition(QSlider::TicksBelow);
+    procColor1B->setTickInterval(51);
+    procColor1B->setMinimum(0);
+    procColor1B->setMaximum(255);
+    procColor1B->setSliderPosition(0);
+    connect(procColor1R, SIGNAL(valueChanged(int)),this,SLOT(updateProcColor1R(int)));
+    connect(procColor1G, SIGNAL(valueChanged(int)),this,SLOT(updateProcColor1G(int)));
+    connect(procColor1B, SIGNAL(valueChanged(int)),this,SLOT(updateProcColor1B(int)));
+    QLabel* pc1 = new QLabel("RGBs of first procedural color");
+    QLabel* pc1R = new QLabel("Reds = ");
+    QLabel* pc1G = new QLabel("Greens = ");
+    QLabel* pc1B = new QLabel("Blues = ");
+    QLabel* pc1RValue = new QLabel();
+    QLabel* pc1GValue = new QLabel();
+    QLabel* pc1BValue = new QLabel();
+    pc1RValue->setNum(0);
+    pc1GValue->setNum(0);
+    pc1BValue->setNum(0);
+    connect(procColor1R, SIGNAL(valueChanged(int)),pc1RValue, SLOT(setNum(int)));
+    connect(procColor1G, SIGNAL(valueChanged(int)),pc1GValue, SLOT(setNum(int)));
+    connect(procColor1B, SIGNAL(valueChanged(int)),pc1BValue, SLOT(setNum(int)));
+    outer->addWidget(pc1);
+    QHBoxLayout* r1 = new QHBoxLayout;
+    r1->addWidget(pc1R);
+    r1->addWidget(pc1RValue);
+    outer->addLayout(r1);
+    outer->addWidget(procColor1R);
+    
+    QHBoxLayout* g1 = new QHBoxLayout;
+    g1->addWidget(pc1G);
+    g1->addWidget(pc1GValue);
+    outer->addLayout(g1);
+    outer->addWidget(procColor1G);
+
+    QHBoxLayout* b1 = new QHBoxLayout;
+    b1->addWidget(pc1B);
+    b1->addWidget(pc1BValue);
+    outer->addLayout(b1);
+    outer->addWidget(procColor1B);
+
+    
+
+
+    QSlider* procColor2R = new QSlider(Qt::Horizontal);
+    procColor2R->setTickPosition(QSlider::TicksBelow);
+    procColor2R->setTickInterval(51);
+    procColor2R->setMinimum(0);
+    procColor2R->setMaximum(255);
+    procColor2R->setSliderPosition(0);
+    QSlider* procColor2G = new QSlider(Qt::Horizontal);
+    procColor2G->setTickPosition(QSlider::TicksBelow);
+    procColor2G->setTickInterval(51);
+    procColor2G->setMinimum(0);
+    procColor2G->setMaximum(255);
+    procColor2G->setSliderPosition(0);
+    QSlider* procColor2B = new QSlider(Qt::Horizontal);
+    procColor2B->setTickPosition(QSlider::TicksBelow);
+    procColor2B->setTickInterval(51);
+    procColor2B->setMinimum(0);
+    procColor2B->setMaximum(255);
+    procColor2B->setSliderPosition(0);
+    connect(procColor2R, SIGNAL(valueChanged(int)),this,SLOT(updateProcColor2R(int)));
+    connect(procColor2G, SIGNAL(valueChanged(int)),this,SLOT(updateProcColor2G(int)));
+    connect(procColor2B, SIGNAL(valueChanged(int)),this,SLOT(updateProcColor2B(int)));
+    QLabel* pc2 = new QLabel("RGBs of second procedural color");
+    QLabel* pc2R = new QLabel("Reds = ");
+    QLabel* pc2G = new QLabel("Greens = ");
+    QLabel* pc2B = new QLabel("Blues = ");
+    QLabel* pc2RValue = new QLabel();
+    QLabel* pc2GValue = new QLabel();
+    QLabel* pc2BValue = new QLabel();
+    pc2RValue->setNum(0);
+    pc2GValue->setNum(0);
+    pc2BValue->setNum(0);
+    connect(procColor2R, SIGNAL(valueChanged(int)),pc2RValue, SLOT(setNum(int)));
+    connect(procColor2G, SIGNAL(valueChanged(int)),pc2GValue, SLOT(setNum(int)));
+    connect(procColor2B, SIGNAL(valueChanged(int)),pc2BValue, SLOT(setNum(int)));
+    outer->addWidget(pc2);
+    QHBoxLayout* r2 = new QHBoxLayout;
+    r2->addWidget(pc2R);
+    r2->addWidget(pc2RValue);
+    outer->addLayout(r2);
+    outer->addWidget(procColor2R);
+
+    QHBoxLayout* g2 = new QHBoxLayout;
+    g2->addWidget(pc2G);
+    g2->addWidget(pc2GValue);
+    outer->addLayout(g2);
+    outer->addWidget(procColor2G);
+
+    QHBoxLayout* b2 = new QHBoxLayout;
+    b2->addWidget(pc2B);
+    b2->addWidget(pc2BValue);
+    outer->addLayout(b2);
+    outer->addWidget(procColor2B);
+
+
+    QSlider* procColor3R = new QSlider(Qt::Horizontal);
+    procColor3R->setTickPosition(QSlider::TicksBelow);
+    procColor3R->setTickInterval(51);
+    procColor3R->setMinimum(0);
+    procColor3R->setMaximum(255);
+    procColor3R->setSliderPosition(0);
+    QSlider* procColor3G = new QSlider(Qt::Horizontal);
+    procColor3G->setTickPosition(QSlider::TicksBelow);
+    procColor3G->setTickInterval(51);
+    procColor3G->setMinimum(0);
+    procColor3G->setMaximum(255);
+    procColor3G->setSliderPosition(0);
+    QSlider* procColor3B = new QSlider(Qt::Horizontal);
+    procColor3B->setTickPosition(QSlider::TicksBelow);
+    procColor3B->setTickInterval(51);
+    procColor3B->setMinimum(0);
+    procColor3B->setMaximum(255);
+    procColor3B->setSliderPosition(0);
+    connect(procColor3R, SIGNAL(valueChanged(int)),this,SLOT(updateProcColor3R(int)));
+    connect(procColor3G, SIGNAL(valueChanged(int)),this,SLOT(updateProcColor3G(int)));
+    connect(procColor3B, SIGNAL(valueChanged(int)),this,SLOT(updateProcColor3B(int)));
+    QLabel* pc3 = new QLabel("RGBs of third procedural color");
+    QLabel* pc3R = new QLabel("Reds = ");
+    QLabel* pc3G = new QLabel("Greens = ");
+    QLabel* pc3B = new QLabel("Blues = ");
+    QLabel* pc3RValue = new QLabel();
+    QLabel* pc3GValue = new QLabel();
+    QLabel* pc3BValue = new QLabel();
+    pc3RValue->setNum(0);
+    pc3GValue->setNum(0);
+    pc3BValue->setNum(0);
+    connect(procColor3R, SIGNAL(valueChanged(int)),pc3RValue, SLOT(setNum(int)));
+    connect(procColor3G, SIGNAL(valueChanged(int)),pc3GValue, SLOT(setNum(int)));
+    connect(procColor3B, SIGNAL(valueChanged(int)),pc3BValue, SLOT(setNum(int)));
+    outer->addWidget(pc3);
+    QHBoxLayout* r3 = new QHBoxLayout;
+    r3->addWidget(pc3R);
+    r3->addWidget(pc3RValue);
+    outer->addLayout(r3);
+    outer->addWidget(procColor3R);
+
+    QHBoxLayout* g3 = new QHBoxLayout;
+    g3->addWidget(pc3G);
+    g3->addWidget(pc3GValue);
+    outer->addLayout(g3);
+    outer->addWidget(procColor3G);
+
+    QHBoxLayout* b3 = new QHBoxLayout;
+    b3->addWidget(pc3B);
+    b3->addWidget(pc3BValue);
+    outer->addLayout(b3);
+    outer->addWidget(procColor3B);
+
+    QSlider* p1Slider = new QSlider(Qt::Horizontal);
+    p1Slider->setTickPosition(QSlider::TicksBelow);
+    p1Slider->setTickInterval(1);
+    p1Slider->setMinimum(10);
+    p1Slider->setMaximum(50);
+    p1Slider->setSliderPosition(1);
+    connect(p1Slider,SIGNAL(valueChanged(int)),this,SLOT(updatePeriode1(int)));
+    QLabel* p1Label = new QLabel("Periode1=");
+    QLabel* p1LabelValue = new QLabel();
+    p1LabelValue->setNum(10);
+    connect(p1Slider,SIGNAL(valueChanged(int)),p1LabelValue,SLOT(setNum(int)));
+    QHBoxLayout *hboxP1= new QHBoxLayout;
+    hboxP1->addWidget(p1Label);
+    hboxP1->addWidget(p1LabelValue);
+    outer->addLayout(hboxP1);
+    outer->addWidget(p1Slider);
+    
+    QSlider* p2Slider = new QSlider(Qt::Horizontal);
+    p2Slider->setTickPosition(QSlider::TicksBelow);
+    p2Slider->setTickInterval(1);
+    p2Slider->setMinimum(10);
+    p2Slider->setMaximum(50);
+    p2Slider->setSliderPosition(10);
+    connect(p2Slider,SIGNAL(valueChanged(int)),this,SLOT(updatePeriode2(int)));
+    QLabel* p2Label = new QLabel("Periode 2 =");
+    QLabel* p2LabelValue = new QLabel();
+    p2LabelValue->setNum(10);
+    connect(p2Slider,SIGNAL(valueChanged(int)),p2LabelValue,SLOT(setNum(int)));
+    QHBoxLayout *hboxP2= new QHBoxLayout;
+    hboxP2->addWidget(p2Label);
+    hboxP2->addWidget(p2LabelValue);
+    outer->addLayout(hboxP2);
+    outer->addWidget(p2Slider);
+
     auxWidget->setLayout(outer);
     return auxWidget;
 }
@@ -1131,6 +1385,14 @@ void glShaderWindow::render()
         compute_program->setUniformValue("counter", counter);
         compute_program->setUniformValue("normalMapping", normalMap);
         compute_program->setUniformValue("procedural",procedural);
+        compute_program->setUniformValue("proceduralColor1",procColor1);
+        compute_program->setUniformValue("proceduralColor2",procColor2);
+        compute_program->setUniformValue("proceduralColor3",procColor3);
+        compute_program->setUniformValue("periode1", periode1);
+        compute_program->setUniformValue("periode2", periode2);
+
+
+
 		glBindImageTexture(2, computeResult->textureId(), 0, false, 0, GL_WRITE_ONLY, GL_RGBA32F);
         int worksize_x = nextPower2(width());
         int worksize_y = nextPower2(height());
