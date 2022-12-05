@@ -1063,6 +1063,18 @@ void glShaderWindow::loadTexturesForShaders() {
             computeResult->allocateStorage();
             computeResult->bind(2);
         }
+        glActiveTexture(GL_TEXTURE4);
+        computeResult = new QOpenGLTexture(QOpenGLTexture::Target2D);
+        if (computeResult) {
+        	computeResult->create();
+            computeResult->setFormat(QOpenGLTexture::RGBA32F);
+            computeResult->setSize(width(), height());
+            computeResult->setWrapMode(QOpenGLTexture::MirroredRepeat);
+            computeResult->setMinificationFilter(QOpenGLTexture::Nearest);
+            computeResult->setMagnificationFilter(QOpenGLTexture::Nearest);
+            computeResult->allocateStorage();
+            computeResult->bind(2);
+        }
     } else if (m_program->uniformLocation("shadowMap") != -1) {
     	// without Qt functions this time
 		glActiveTexture(GL_TEXTURE2);
@@ -1417,7 +1429,6 @@ void glShaderWindow::render()
         int worksize_y = nextPower2(height());
         glDispatchCompute(worksize_x / compute_groupsize_x, worksize_y / compute_groupsize_y, 1);
         glBindImageTexture(2, 0, 0, false, 0, GL_READ_ONLY, GL_RGBA32F); 
-        glBindImageTexture(2, 3, 0, false, 0, GL_READ_ONLY, GL_RGBA32F); 
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
         compute_program->release();
 	} else if (m_program->uniformLocation("shadowMap") != -1) {
