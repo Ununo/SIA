@@ -34,7 +34,7 @@ glShaderWindow::glShaderWindow(QWindow *parent)
       gpgpu_vertices(0), gpgpu_normals(0), gpgpu_texcoords(0), gpgpu_colors(0), gpgpu_indices(0),
       environmentMap(0), texture(0), normalTexture(0), permTexture(0), pixels(0), mouseButton(Qt::NoButton), auxWidget(0),
       isGPGPU(true), hasComputeShaders(true), blinnPhong(true), transparent(true), eta(1.5), lightIntensity(1.0f), shininess(50.0f), lightDistance(5.0f), groundDistance(0.78),normalMap(false),procedural(false),
-      procColor1(1, 1, 1), procColor2(1, 0, 0), procColor3(1, 1, 0), periode1(10), periode2(20), halton(false), showConvergence(false),
+      procColor1(1, 1, 1), procColor2(1, 0, 0), procColor3(1, 1, 0), periode1(10), periode2(20), halton(false), showConvergence(false),bounces(1),
       shadowMap_fboId(0), shadowMap_rboId(0), shadowMap_textureId(0), fullScreenSnapshots(false), computeResult(0), squaredMeans(0),
       m_indexBuffer(QOpenGLBuffer::IndexBuffer), ground_indexBuffer(QOpenGLBuffer::IndexBuffer)
 {
@@ -351,6 +351,12 @@ void glShaderWindow::updateShowConv(){
     renderNow();
 }
 
+void glShaderWindow::updateBouncesNumber(int param) {
+    counter=0;
+    bounces = param;
+    renderNow();
+}
+
 QWidget * glShaderWindow::makeAuxWindow()
 {
     if (auxWidget)
@@ -446,15 +452,20 @@ QWidget * glShaderWindow::makeAuxWindow()
     QPushButton* haltonButton = new QPushButton();
     haltonButton->setCheckable(true);
     haltonButton->setChecked(halton);
-    if (halton)haltonButton->setText("Halton");
-    else haltonButton->setText("Gold Noise");
+    if (halton) {
+        haltonButton->setText("Halton");
+    } else {
+        haltonButton->setText("Gold Noise");
+    }
     connect(haltonButton, SIGNAL(clicked()), this, SLOT(updateHalton()));
+    connect(haltonButton, SIGNAL(clicked()), haltonButton, SLOT(setText(halton ? "Halton" : "Gold Noise")));
     QPushButton* convergenceButton = new QPushButton();
     convergenceButton->setCheckable(true);
     convergenceButton->setChecked(showConvergence);
     if (showConvergence)convergenceButton->setText("Yes");
     else convergenceButton->setText("No");
     connect(convergenceButton, SIGNAL(clicked()), this, SLOT(updateShowConv()));
+    connect(convergenceButton, SIGNAL(clicked()), convergenceButton, SLOT(setText(showConvergence ? "Yes" : "No")));
     QLabel* tp3lab = new QLabel("TP3 params");
     QHBoxLayout* tp3buttons = new QHBoxLayout;
     tp3buttons->addWidget(convergenceButton);
@@ -495,6 +506,25 @@ QWidget * glShaderWindow::makeAuxWindow()
 
     outer->addLayout(advanced);
     outer->addLayout(buttons);
+
+
+    // Slider for number of ray bounces control
+
+    QSlider* bouncesSlider = new QSlider(Qt::Horizontal);
+    bouncesSlider->setTickPosition(QSlider::TicksBelow);
+    bouncesSlider->setTickInterval(1);
+    bouncesSlider->setMinimum(1);
+    bouncesSlider->setMaximum(10);
+    bouncesSlider->setSliderPosition(1);
+    connect(bouncesSlider, SIGNAL(valueChanged(int)), this, SLOT(updateBouncesNumber(int)));
+    QLabel* bouncesLabel = new QLabel("Number of bounces =");
+    QLabel* bouncesLabelValue = new QLabel();
+    connect(bouncesSlider, SIGNAL(valueChanged(int)), bouncesLabelValue, SLOT(setNum(int)));
+    QHBoxLayout* hboxBounces = new QHBoxLayout;
+    hboxBounces->addWidget(bouncesLabel);
+    hboxBounces->addWidget(bouncesLabelValue);
+    outer->addLayout(hboxBounces);
+    outer->addWidget(bouncesSlider);
 
     QSlider* procColor1R = new QSlider(Qt::Horizontal);
     procColor1R->setTickPosition(QSlider::TicksBelow);
@@ -1491,6 +1521,7 @@ void glShaderWindow::render()
         compute_program->setUniformValue("periode2", periode2);
         compute_program->setUniformValue("showConvergence", showConvergence);
         compute_program->setUniformValue("convergenceMode", halton);
+        compute_program->setUniformValue("bouncesNumber", bounces);
 
 
 		glBindImageTexture(2, computeResult->textureId(), 0, false, 0, GL_WRITE_ONLY, GL_RGBA32F);

@@ -64,6 +64,7 @@ public slots:
     void updatePeriode2(int param);
     void updateHalton();
     void updateShowConv();
+    void updateBouncesNumber(int param);
 
 protected:
     void mousePressEvent(QMouseEvent *e);
@@ -133,6 +134,7 @@ private:
 
     bool halton;
     bool showConvergence;
+    int bounces;
 
     // OpenGL variables encapsulated by Qt
     QOpenGLShaderProgram *m_program;
