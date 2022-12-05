@@ -449,8 +449,8 @@ QWidget * glShaderWindow::makeAuxWindow()
     QPushButton* convergenceButton = new QPushButton();
     haltonButton->setCheckable(true);
     haltonButton->setChecked(showConvergence);
-    if (halton)haltonButton->setText("Yes");
-    else haltonButton->setText("No");
+    if (showConvergence)convergenceButton->setText("Yes");
+    else convergenceButton->setText("No");
     connect(convergenceButton, SIGNAL(clicked()), this, SLOT(updateShowConv()));
     QLabel* tp3lab = new QLabel("TP3 params");
     QHBoxLayout* tp3buttons = new QHBoxLayout;
