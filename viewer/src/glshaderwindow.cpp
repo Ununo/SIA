@@ -447,8 +447,8 @@ QWidget * glShaderWindow::makeAuxWindow()
     else haltonButton->setText("Gold Noise");
     connect(haltonButton, SIGNAL(clicked()), this, SLOT(updateHalton()));
     QPushButton* convergenceButton = new QPushButton();
-    haltonButton->setCheckable(true);
-    haltonButton->setChecked(showConvergence);
+    convergenceButton->setCheckable(true);
+    convergenceButton->setChecked(showConvergence);
     if (showConvergence)convergenceButton->setText("Yes");
     else convergenceButton->setText("No");
     connect(convergenceButton, SIGNAL(clicked()), this, SLOT(updateShowConv()));
