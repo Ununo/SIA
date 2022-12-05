@@ -16,6 +16,7 @@
 #include <QHBoxLayout>
 #include <QComboBox>
 #include <QDebug>
+#include <QPushButton>
 #include <assert.h>
 
 #include "perlinNoise.h" // defines tables for Perlin Noise
@@ -33,7 +34,7 @@ glShaderWindow::glShaderWindow(QWindow *parent)
       gpgpu_vertices(0), gpgpu_normals(0), gpgpu_texcoords(0), gpgpu_colors(0), gpgpu_indices(0),
       environmentMap(0), texture(0), normalTexture(0), permTexture(0), pixels(0), mouseButton(Qt::NoButton), auxWidget(0),
       isGPGPU(true), hasComputeShaders(true), blinnPhong(true), transparent(true), eta(1.5), lightIntensity(1.0f), shininess(50.0f), lightDistance(5.0f), groundDistance(0.78),normalMap(false),procedural(false),
-      procColor1(1, 1, 1), procColor2(1, 0, 0), procColor3(1, 1, 0), periode1(10), periode2(20),
+      procColor1(1, 1, 1), procColor2(1, 0, 0), procColor3(1, 1, 0), periode1(10), periode2(20), halton(false), showConvergence(false),
       shadowMap_fboId(0), shadowMap_rboId(0), shadowMap_textureId(0), fullScreenSnapshots(false), computeResult(0), 
       m_indexBuffer(QOpenGLBuffer::IndexBuffer), ground_indexBuffer(QOpenGLBuffer::IndexBuffer)
 {
@@ -338,6 +339,16 @@ void glShaderWindow::updatePeriode2(int param) {
     renderNow();
 }
 
+void glShaderWindow::updateHalton(){
+    halton = !halton;
+    renderNow();
+}
+
+void glShaderWindow::updateShowConv(){
+    showConvergence = !showConvergence;
+    renderNow();
+}
+
 QWidget * glShaderWindow::makeAuxWindow()
 {
     if (auxWidget)
@@ -426,6 +437,30 @@ QWidget * glShaderWindow::makeAuxWindow()
     hboxEta->addWidget(etaLabelValue);
     outer->addLayout(hboxEta);
     outer->addWidget(etaSlider);
+
+    // TP3 :
+
+    QPushButton* haltonButton = new QPushButton();
+    haltonButton->setCheckable(true);
+    haltonButton->setChecked(halton);
+    if (halton)haltonButton->setText("Halton");
+    else haltonButton->setText("Gold Noise");
+    connect(haltonButton, SIGNAL(clicked()), this, SLOT(updateHalton()));
+    QPushButton* convergenceButton = new QPushButton();
+    haltonButton->setCheckable(true);
+    haltonButton->setChecked(showConvergence);
+    if (halton)haltonButton->setText("Yes");
+    else haltonButton->setText("No");
+    connect(convergenceButton, SIGNAL(clicked()), this, SLOT(updateShowConv()));
+    QLabel* tp3lab = new QLabel("TP3 params");
+    QHBoxLayout* tp3buttons = new QHBoxLayout;
+    tp3buttons->addWidget(convergenceButton);
+    tp3buttons->addWidget(haltonButton);
+    outer->addWidget(tp3lab);
+    outer->addLayout(tp3buttons);
+
+
+
 
     // Normal Mapping radio button
     QGroupBox* normalMappingBox = new QGroupBox("Normal Maps :");
@@ -1421,7 +1456,8 @@ void glShaderWindow::render()
         compute_program->setUniformValue("proceduralColor3",procColor3);
         compute_program->setUniformValue("periode1", periode1);
         compute_program->setUniformValue("periode2", periode2);
-
+        compute_program->setUniformValue("showConvergence", showConvergence);
+        compute_program->setUniformValue("convergenceMode", halton);
 
 
 		glBindImageTexture(2, computeResult->textureId(), 0, false, 0, GL_WRITE_ONLY, GL_RGBA32F);

@@ -62,7 +62,8 @@ public slots:
     void updateProcColor3B(int param);
     void updatePeriode1(int param);
     void updatePeriode2(int param);
-
+    void updateHalton();
+    void updateShowConv();
 
 protected:
     void mousePressEvent(QMouseEvent *e);
@@ -130,6 +131,9 @@ private:
     int periode1;
     int periode2;
 
+    bool halton;
+    bool showConvergence;
+
     // OpenGL variables encapsulated by Qt
     QOpenGLShaderProgram *m_program;
     QOpenGLShaderProgram *ground_program;
@@ -178,6 +182,7 @@ private:
     QWidget* container;
     QTimer* timer;
     int counter;
+
 };
 
 #endif // GLSHADERWINDOW_H
