@@ -340,11 +340,13 @@ void glShaderWindow::updatePeriode2(int param) {
 }
 
 void glShaderWindow::updateHalton(){
+    counter=0;
     halton = !halton;
     renderNow();
 }
 
 void glShaderWindow::updateShowConv(){
+    counter=0;
     showConvergence = !showConvergence;
     renderNow();
 }
@@ -443,18 +445,14 @@ QWidget * glShaderWindow::makeAuxWindow()
     QPushButton* haltonButton = new QPushButton();
     haltonButton->setCheckable(true);
     haltonButton->setChecked(halton);
-    QString* haltonText;
-    if (halton) haltonText = new QString("Halton");
-    else haltonText = new QString("Gold Noise");
-    haltonButton->setText(*haltonText);
+    if (halton)haltonButton->setText("Halton");
+    else haltonButton->setText("Gold Noise");
     connect(haltonButton, SIGNAL(clicked()), this, SLOT(updateHalton()));
     QPushButton* convergenceButton = new QPushButton();
     convergenceButton->setCheckable(true);
     convergenceButton->setChecked(showConvergence);
-    QString* convText;
-    if (showConvergence)convText = new QString("Yes");
-    else convText = new QString("No");
-    convergenceButton->setText(*convText);
+    if (showConvergence)convergenceButton->setText("Yes");
+    else convergenceButton->setText("No");
     connect(convergenceButton, SIGNAL(clicked()), this, SLOT(updateShowConv()));
     QLabel* tp3lab = new QLabel("TP3 params");
     QHBoxLayout* tp3buttons = new QHBoxLayout;
