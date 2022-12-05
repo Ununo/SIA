@@ -123,6 +123,12 @@ private:
     float groundDistance;
     bool normalMap;
     bool procedural;
+    QVector3D procColor1;
+    QVector3D procColor2;
+    QVector3D procColor3;
+
+    int periode1;
+    int periode2;
 
     // OpenGL variables encapsulated by Qt
     QOpenGLShaderProgram *m_program;
@@ -172,15 +178,6 @@ private:
     QWidget* container;
     QTimer* timer;
     int counter;
-
-    QVector3D procColor1;
-    QVector3D procColor2;
-    QVector3D procColor3;
-
-    int periode1;
-    int periode2;
-
-    
 };
 
 #endif // GLSHADERWINDOW_H

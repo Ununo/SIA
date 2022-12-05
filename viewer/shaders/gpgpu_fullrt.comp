@@ -575,7 +575,7 @@ float snoise3(float x, float y, float z) {
     // Add contributions from each corner to get the final noise value.
     // The result is scaled to stay just inside [-1,1]
     return (32.0 * (n0 + n1 + n2 + n3) + 1) /2; // TODO: The scale factor is preliminary!
-  }
+}
 
 float turbulence(float x, float y, float z, float size)
 {
@@ -590,7 +590,7 @@ float turbulence(float x, float y, float z, float size)
   return(128.0 * value / initialSize);
 }
 
-int noiseSize = 180;
+int noiseSize = 400;
 
 void getLocal(vec4 origin, vec4 dir, hitinfo_t h, out vec4 color, out vec4 p, out vec4 n)
 {
@@ -599,14 +599,13 @@ void getLocal(vec4 origin, vec4 dir, hitinfo_t h, out vec4 color, out vec4 p, ou
         color = texture(colorTexture, h.t.pq);
         p.y = -groundDistance;
         if (normalMapping){
-            n = texture(normalTexture, h.t.pq);
+            n = normalize(texture(normalTexture, h.t.pq));
         }
         else{
             n = vec4(0.0, 1.0, 0.0, 0.0);
         }
     } else {
         if (procedural){
-            //h.t.w + h.t.y + h.t.z
             float turbPower1 = 100.0;
             float turbPower2 = 70.0;
             float turbSize = 128.0;
@@ -615,8 +614,9 @@ void getLocal(vec4 origin, vec4 dir, hitinfo_t h, out vec4 color, out vec4 p, ou
             float xyzValue2 = pos.x * periode2 / noiseSize + pos.y * periode2 / noiseSize + pos.z * periode2 / noiseSize + turbPower2 * turbulence(pos.x, pos.y, pos.z, turbSize)/256;
             float sinNoise1 = (sin(xyzValue1) + 1)/2;
             float sinNoise2 = (sin(xyzValue2) + 1)/2;
-            if ((sinNoise1 + sinNoise2)/2 > 0.5){
-                color = vec4((sinNoise1 + sinNoise2)/2* proceduralColor1, 1);
+            float sinNoiseAverage = (sinNoise1 + sinNoise2)/2;
+            if (sinNoiseAverage > 0.5){
+                color = vec4(sinNoiseAverage* proceduralColor1, 1);
             }
             else{
                 color = vec4((1-sinNoise1) * proceduralColor2, 1);
