@@ -1,18 +1,19 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'glshaderwindow.h'
 **
-** Created by: The Qt Meta Object Compiler version 67 (Qt 5.12.8)
+** Created by: The Qt Meta Object Compiler version 67 (Qt 5.15.3)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
+#include <memory>
 #include "src/glshaderwindow.h"
 #include <QtCore/qbytearray.h>
 #include <QtCore/qmetatype.h>
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'glshaderwindow.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 67
-#error "This file was generated using the moc from 5.12.8. It"
+#error "This file was generated using the moc from 5.15.3. It"
 #error "cannot be used with the include files from this version of Qt."
 #error "(The moc has changed too much.)"
 #endif
@@ -21,8 +22,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_glShaderWindow_t {
-    QByteArrayData data[38];
-    char stringdata0[594];
+    QByteArrayData data[40];
+    char stringdata0[622];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -68,7 +69,9 @@ QT_MOC_LITERAL(33, 510, 17), // "updateProcColor3R"
 QT_MOC_LITERAL(34, 528, 17), // "updateProcColor3G"
 QT_MOC_LITERAL(35, 546, 17), // "updateProcColor3B"
 QT_MOC_LITERAL(36, 564, 14), // "updatePeriode1"
-QT_MOC_LITERAL(37, 579, 14) // "updatePeriode2"
+QT_MOC_LITERAL(37, 579, 14), // "updatePeriode2"
+QT_MOC_LITERAL(38, 594, 12), // "updateHalton"
+QT_MOC_LITERAL(39, 607, 14) // "updateShowConv"
 
     },
     "glShaderWindow\0openSceneFromFile\0\0"
@@ -86,7 +89,8 @@ QT_MOC_LITERAL(37, 579, 14) // "updatePeriode2"
     "updateProcColor2R\0updateProcColor2G\0"
     "updateProcColor2B\0updateProcColor3R\0"
     "updateProcColor3G\0updateProcColor3B\0"
-    "updatePeriode1\0updatePeriode2"
+    "updatePeriode1\0updatePeriode2\0"
+    "updateHalton\0updateShowConv"
 };
 #undef QT_MOC_LITERAL
 
@@ -96,7 +100,7 @@ static const uint qt_meta_data_glShaderWindow[] = {
        8,       // revision
        0,       // classname
        0,    0, // classinfo
-      30,   14, // methods
+      32,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -104,36 +108,38 @@ static const uint qt_meta_data_glShaderWindow[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    0,  164,    2, 0x0a /* Public */,
-       3,    0,  165,    2, 0x0a /* Public */,
-       4,    0,  166,    2, 0x0a /* Public */,
-       5,    0,  167,    2, 0x0a /* Public */,
-       6,    0,  168,    2, 0x0a /* Public */,
-       7,    0,  169,    2, 0x0a /* Public */,
-       8,    0,  170,    2, 0x0a /* Public */,
-      10,    1,  171,    2, 0x0a /* Public */,
-      12,    0,  174,    2, 0x0a /* Public */,
-      13,    0,  175,    2, 0x0a /* Public */,
-      14,    0,  176,    2, 0x0a /* Public */,
-      15,    0,  177,    2, 0x0a /* Public */,
-      16,    1,  178,    2, 0x0a /* Public */,
-      18,    1,  181,    2, 0x0a /* Public */,
-      20,    1,  184,    2, 0x0a /* Public */,
-      22,    0,  187,    2, 0x0a /* Public */,
-      23,    0,  188,    2, 0x0a /* Public */,
-      24,    0,  189,    2, 0x0a /* Public */,
-      25,    0,  190,    2, 0x0a /* Public */,
-      26,    1,  191,    2, 0x0a /* Public */,
-      28,    1,  194,    2, 0x0a /* Public */,
-      29,    1,  197,    2, 0x0a /* Public */,
-      30,    1,  200,    2, 0x0a /* Public */,
-      31,    1,  203,    2, 0x0a /* Public */,
-      32,    1,  206,    2, 0x0a /* Public */,
-      33,    1,  209,    2, 0x0a /* Public */,
-      34,    1,  212,    2, 0x0a /* Public */,
-      35,    1,  215,    2, 0x0a /* Public */,
-      36,    1,  218,    2, 0x0a /* Public */,
-      37,    1,  221,    2, 0x0a /* Public */,
+       1,    0,  174,    2, 0x0a /* Public */,
+       3,    0,  175,    2, 0x0a /* Public */,
+       4,    0,  176,    2, 0x0a /* Public */,
+       5,    0,  177,    2, 0x0a /* Public */,
+       6,    0,  178,    2, 0x0a /* Public */,
+       7,    0,  179,    2, 0x0a /* Public */,
+       8,    0,  180,    2, 0x0a /* Public */,
+      10,    1,  181,    2, 0x0a /* Public */,
+      12,    0,  184,    2, 0x0a /* Public */,
+      13,    0,  185,    2, 0x0a /* Public */,
+      14,    0,  186,    2, 0x0a /* Public */,
+      15,    0,  187,    2, 0x0a /* Public */,
+      16,    1,  188,    2, 0x0a /* Public */,
+      18,    1,  191,    2, 0x0a /* Public */,
+      20,    1,  194,    2, 0x0a /* Public */,
+      22,    0,  197,    2, 0x0a /* Public */,
+      23,    0,  198,    2, 0x0a /* Public */,
+      24,    0,  199,    2, 0x0a /* Public */,
+      25,    0,  200,    2, 0x0a /* Public */,
+      26,    1,  201,    2, 0x0a /* Public */,
+      28,    1,  204,    2, 0x0a /* Public */,
+      29,    1,  207,    2, 0x0a /* Public */,
+      30,    1,  210,    2, 0x0a /* Public */,
+      31,    1,  213,    2, 0x0a /* Public */,
+      32,    1,  216,    2, 0x0a /* Public */,
+      33,    1,  219,    2, 0x0a /* Public */,
+      34,    1,  222,    2, 0x0a /* Public */,
+      35,    1,  225,    2, 0x0a /* Public */,
+      36,    1,  228,    2, 0x0a /* Public */,
+      37,    1,  231,    2, 0x0a /* Public */,
+      38,    0,  234,    2, 0x0a /* Public */,
+      39,    0,  235,    2, 0x0a /* Public */,
 
  // slots: parameters
     QMetaType::Void,
@@ -166,6 +172,8 @@ static const uint qt_meta_data_glShaderWindow[] = {
     QMetaType::Void, QMetaType::Int,   27,
     QMetaType::Void, QMetaType::Int,   27,
     QMetaType::Void, QMetaType::Int,   27,
+    QMetaType::Void,
+    QMetaType::Void,
 
        0        // eod
 };
@@ -174,7 +182,7 @@ void glShaderWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
         auto *_t = static_cast<glShaderWindow *>(_o);
-        Q_UNUSED(_t)
+        (void)_t;
         switch (_id) {
         case 0: _t->openSceneFromFile(); break;
         case 1: _t->openNewTexture(); break;
@@ -207,13 +215,15 @@ void glShaderWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _
         case 27: _t->updateProcColor3B((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 28: _t->updatePeriode1((*reinterpret_cast< int(*)>(_a[1]))); break;
         case 29: _t->updatePeriode2((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 30: _t->updateHalton(); break;
+        case 31: _t->updateShowConv(); break;
         default: ;
         }
     }
 }
 
 QT_INIT_METAOBJECT const QMetaObject glShaderWindow::staticMetaObject = { {
-    &OpenGLWindow::staticMetaObject,
+    QMetaObject::SuperData::link<OpenGLWindow::staticMetaObject>(),
     qt_meta_stringdata_glShaderWindow.data,
     qt_meta_data_glShaderWindow,
     qt_static_metacall,
@@ -241,13 +251,13 @@ int glShaderWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 30)
+        if (_id < 32)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 30;
+        _id -= 32;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 30)
+        if (_id < 32)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 30;
+        _id -= 32;
     }
     return _id;
 }
