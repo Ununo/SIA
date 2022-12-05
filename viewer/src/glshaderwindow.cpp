@@ -35,7 +35,7 @@ glShaderWindow::glShaderWindow(QWindow *parent)
       environmentMap(0), texture(0), normalTexture(0), permTexture(0), pixels(0), mouseButton(Qt::NoButton), auxWidget(0),
       isGPGPU(true), hasComputeShaders(true), blinnPhong(true), transparent(true), eta(1.5), lightIntensity(1.0f), shininess(50.0f), lightDistance(5.0f), groundDistance(0.78),normalMap(false),procedural(false),
       procColor1(1, 1, 1), procColor2(1, 0, 0), procColor3(1, 1, 0), periode1(10), periode2(20), halton(false), showConvergence(false),
-      shadowMap_fboId(0), shadowMap_rboId(0), shadowMap_textureId(0), fullScreenSnapshots(false), computeResult(0), 
+      shadowMap_fboId(0), shadowMap_rboId(0), shadowMap_textureId(0), fullScreenSnapshots(false), computeResult(0), squaredMeans(0),
       m_indexBuffer(QOpenGLBuffer::IndexBuffer), ground_indexBuffer(QOpenGLBuffer::IndexBuffer)
 {
     // Default values you might want to tinker with
@@ -52,7 +52,7 @@ glShaderWindow::glShaderWindow(QWindow *parent)
 
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, [&](){glShaderWindow::timerEvent(nullptr);});
-    timer->start(500);
+    timer->start(200);
 }
 
 glShaderWindow::~glShaderWindow()
@@ -1051,6 +1051,12 @@ void glShaderWindow::loadTexturesForShaders() {
         delete computeResult;
         computeResult = 0;
     }
+    if (squaredMeans) {
+        squaredMeans->release();
+        squaredMeans->destroy();
+        delete squaredMeans;
+        squaredMeans = 0;
+    }
 	// Load textures as required by the shader.
 	if ((m_program->uniformLocation("colorTexture") != -1)
         || (hasComputeShaders && compute_program->uniformLocation("colorTexture") != -1)) {
@@ -1226,6 +1232,12 @@ void glShaderWindow::resize(int x, int y)
         computeResult->destroy();
         delete computeResult;
         computeResult = 0;
+    }
+    if (squaredMeans) {
+        squaredMeans->release();
+        squaredMeans->destroy();
+        delete squaredMeans;
+        squaredMeans = 0;
     }
     if (hasComputeShaders) {
     	if (m_program == NULL) return;
@@ -1450,6 +1462,7 @@ void glShaderWindow::render()
         compute_program->bind();
 		computeResult->bind(2);
         glActiveTexture(GL_TEXTURE4);
+        compute_program->bind();
 		squaredMeans->bind(4);
         // Send parameters to compute program:
         compute_program->setUniformValue("center", m_center);
@@ -1481,6 +1494,7 @@ void glShaderWindow::render()
 
 
 		glBindImageTexture(2, computeResult->textureId(), 0, false, 0, GL_WRITE_ONLY, GL_RGBA32F);
+		glBindImageTexture(4, squaredMeans->textureId(), 0, false, 0, GL_WRITE_ONLY, GL_RGBA32F);
         int worksize_x = nextPower2(width());
         int worksize_y = nextPower2(height());
         glDispatchCompute(worksize_x / compute_groupsize_x, worksize_y / compute_groupsize_y, 1);
@@ -1526,6 +1540,7 @@ void glShaderWindow::render()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     if (isGPGPU) {
         m_program->setUniformValue("computeResult", 2);
+        m_program->setUniformValue("squaredMeans", 4);
         m_program->setUniformValue("center", m_center);
         m_program->setUniformValue("mat_inverse", mat_inverse);
         m_program->setUniformValue("persp_inverse", persp_inverse);

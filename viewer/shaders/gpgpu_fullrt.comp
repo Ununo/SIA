@@ -78,10 +78,10 @@ float  grad3( int hash, float x, float y , float z ) {
             v = z;
         }
     }
-    if (h%2 == 1){
+    if ((h&1) == 1){
         u = -u;
     }
-    else{
+    if ((h&2) == 1){
         v = -v;
     }
     return u+v;
@@ -715,6 +715,26 @@ float gold_noise(in vec2 xy, in float seed){
        return fract(tan(distance(xy*PHI, xy)*seed)*xy.x);
 }
 
+bool checkOneConverge(float x, float variance, float eps){
+    if (x > eps){
+        if (variance < 0.1*x){
+            return true;
+        }
+    }
+    else{
+        if (variance < eps){
+            return true;
+        }
+    }
+    return false;
+}
+
+bool checkConvergence(vec4 color, vec4 variance, float eps){
+    bool xConverge = checkOneConverge(color.x, variance.x, eps);
+    bool yConverge = checkOneConverge(color.y, variance.y, eps);
+    bool zConverge = checkOneConverge(color.z, variance.z, eps);
+    return xConverge && yConverge && zConverge;
+}
 
 layout (local_size_x = 8, local_size_y = 8) in;
 void main(void) {
@@ -723,6 +743,24 @@ void main(void) {
     ivec2 size = imageSize(framebuffer);
     if (pix.x >= size.x || pix.y >= size.y) {
         return;
+    }
+
+    vec4 start_color = imageLoad(framebuffer, pix);
+    
+    if (showConvergence && start_color == vec4(0, 1, 0, 1)){
+        return;
+    }
+    
+    vec4 startMean = imageLoad(squaredMeans, pix);
+    vec4 variance = sqrt(startMean - start_color * start_color);
+    float eps = 0.01;
+    if (counter > 0){
+        if (checkConvergence(start_color, variance, eps)){
+            if (showConvergence){
+                imageStore(framebuffer, pix, vec4(0, 1, 0, 1));
+            }
+            return;
+        }
     }
 
     vec2 float_pix = pix;
@@ -750,10 +788,10 @@ void main(void) {
     vec4 eye = (mat_inverse * vec4(0, 0, 0, 1));
     vec4 color = trace(eye, dir);
 
-    vec4 start_color = imageLoad(framebuffer, pix);
     color = (start_color * counter + color)/(counter + 1);
 
-
+    startMean = (startMean * counter + color*color)/(counter + 1);
+    imageStore(squaredMeans, pix, startMean);
     imageStore(framebuffer, pix, color);
 }
 
