@@ -356,8 +356,9 @@ QWidget * glShaderWindow::makeAuxWindow()
     if (auxWidget)
         if (auxWidget->isVisible()) return auxWidget;
     auxWidget = new QWidget;
-
+    QHBoxLayout *outerwilds = new QHBoxLayout;
     QVBoxLayout *outer = new QVBoxLayout;
+    QVBoxLayout *outer2 = new QVBoxLayout;
     QHBoxLayout *buttons = new QHBoxLayout;
     QHBoxLayout *advanced = new QHBoxLayout;
 
@@ -529,24 +530,24 @@ QWidget * glShaderWindow::makeAuxWindow()
     connect(procColor1R, SIGNAL(valueChanged(int)),pc1RValue, SLOT(setNum(int)));
     connect(procColor1G, SIGNAL(valueChanged(int)),pc1GValue, SLOT(setNum(int)));
     connect(procColor1B, SIGNAL(valueChanged(int)),pc1BValue, SLOT(setNum(int)));
-    outer->addWidget(pc1);
+    outer2->addWidget(pc1);
     QHBoxLayout* r1 = new QHBoxLayout;
     r1->addWidget(pc1R);
     r1->addWidget(pc1RValue);
-    outer->addLayout(r1);
-    outer->addWidget(procColor1R);
+    outer2->addLayout(r1);
+    outer2->addWidget(procColor1R);
     
     QHBoxLayout* g1 = new QHBoxLayout;
     g1->addWidget(pc1G);
     g1->addWidget(pc1GValue);
-    outer->addLayout(g1);
-    outer->addWidget(procColor1G);
+    outer2->addLayout(g1);
+    outer2->addWidget(procColor1G);
 
     QHBoxLayout* b1 = new QHBoxLayout;
     b1->addWidget(pc1B);
     b1->addWidget(pc1BValue);
-    outer->addLayout(b1);
-    outer->addWidget(procColor1B);
+    outer2->addLayout(b1);
+    outer2->addWidget(procColor1B);
 
     
 
@@ -585,24 +586,24 @@ QWidget * glShaderWindow::makeAuxWindow()
     connect(procColor2R, SIGNAL(valueChanged(int)),pc2RValue, SLOT(setNum(int)));
     connect(procColor2G, SIGNAL(valueChanged(int)),pc2GValue, SLOT(setNum(int)));
     connect(procColor2B, SIGNAL(valueChanged(int)),pc2BValue, SLOT(setNum(int)));
-    outer->addWidget(pc2);
+    outer2->addWidget(pc2);
     QHBoxLayout* r2 = new QHBoxLayout;
     r2->addWidget(pc2R);
     r2->addWidget(pc2RValue);
-    outer->addLayout(r2);
-    outer->addWidget(procColor2R);
+    outer2->addLayout(r2);
+    outer2->addWidget(procColor2R);
 
     QHBoxLayout* g2 = new QHBoxLayout;
     g2->addWidget(pc2G);
     g2->addWidget(pc2GValue);
-    outer->addLayout(g2);
-    outer->addWidget(procColor2G);
+    outer2->addLayout(g2);
+    outer2->addWidget(procColor2G);
 
     QHBoxLayout* b2 = new QHBoxLayout;
     b2->addWidget(pc2B);
     b2->addWidget(pc2BValue);
-    outer->addLayout(b2);
-    outer->addWidget(procColor2B);
+    outer2->addLayout(b2);
+    outer2->addWidget(procColor2B);
 
 
     QSlider* procColor3R = new QSlider(Qt::Horizontal);
@@ -639,24 +640,24 @@ QWidget * glShaderWindow::makeAuxWindow()
     connect(procColor3R, SIGNAL(valueChanged(int)),pc3RValue, SLOT(setNum(int)));
     connect(procColor3G, SIGNAL(valueChanged(int)),pc3GValue, SLOT(setNum(int)));
     connect(procColor3B, SIGNAL(valueChanged(int)),pc3BValue, SLOT(setNum(int)));
-    outer->addWidget(pc3);
+    outer2->addWidget(pc3);
     QHBoxLayout* r3 = new QHBoxLayout;
     r3->addWidget(pc3R);
     r3->addWidget(pc3RValue);
-    outer->addLayout(r3);
-    outer->addWidget(procColor3R);
+    outer2->addLayout(r3);
+    outer2->addWidget(procColor3R);
 
     QHBoxLayout* g3 = new QHBoxLayout;
     g3->addWidget(pc3G);
     g3->addWidget(pc3GValue);
-    outer->addLayout(g3);
-    outer->addWidget(procColor3G);
+    outer2->addLayout(g3);
+    outer2->addWidget(procColor3G);
 
     QHBoxLayout* b3 = new QHBoxLayout;
     b3->addWidget(pc3B);
     b3->addWidget(pc3BValue);
-    outer->addLayout(b3);
-    outer->addWidget(procColor3B);
+    outer2->addLayout(b3);
+    outer2->addWidget(procColor3B);
 
     QSlider* p1Slider = new QSlider(Qt::Horizontal);
     p1Slider->setTickPosition(QSlider::TicksBelow);
@@ -672,8 +673,8 @@ QWidget * glShaderWindow::makeAuxWindow()
     QHBoxLayout *hboxP1= new QHBoxLayout;
     hboxP1->addWidget(p1Label);
     hboxP1->addWidget(p1LabelValue);
-    outer->addLayout(hboxP1);
-    outer->addWidget(p1Slider);
+    outer2->addLayout(hboxP1);
+    outer2->addWidget(p1Slider);
     
     QSlider* p2Slider = new QSlider(Qt::Horizontal);
     p2Slider->setTickPosition(QSlider::TicksBelow);
@@ -689,10 +690,12 @@ QWidget * glShaderWindow::makeAuxWindow()
     QHBoxLayout *hboxP2= new QHBoxLayout;
     hboxP2->addWidget(p2Label);
     hboxP2->addWidget(p2LabelValue);
-    outer->addLayout(hboxP2);
-    outer->addWidget(p2Slider);
+    outer2->addLayout(hboxP2);
+    outer2->addWidget(p2Slider);
 
-    auxWidget->setLayout(outer);
+    outerwilds->addLayout(outer);
+    outerwilds->addLayout(outer2);
+    auxWidget->setLayout(outerwilds);
     return auxWidget;
 }
 
