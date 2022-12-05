@@ -1099,16 +1099,16 @@ void glShaderWindow::loadTexturesForShaders() {
             computeResult->bind(2);
         }
         glActiveTexture(GL_TEXTURE4);
-        computeResult = new QOpenGLTexture(QOpenGLTexture::Target2D);
-        if (computeResult) {
-        	computeResult->create();
-            computeResult->setFormat(QOpenGLTexture::RGBA32F);
-            computeResult->setSize(width(), height());
-            computeResult->setWrapMode(QOpenGLTexture::MirroredRepeat);
-            computeResult->setMinificationFilter(QOpenGLTexture::Nearest);
-            computeResult->setMagnificationFilter(QOpenGLTexture::Nearest);
-            computeResult->allocateStorage();
-            computeResult->bind(2);
+        squaredMeans = new QOpenGLTexture(QOpenGLTexture::Target2D);
+        if (squaredMeans) {
+        	squaredMeans->create();
+            squaredMeans->setFormat(QOpenGLTexture::RGBA32F);
+            squaredMeans->setSize(width(), height());
+            squaredMeans->setWrapMode(QOpenGLTexture::MirroredRepeat);
+            squaredMeans->setMinificationFilter(QOpenGLTexture::Nearest);
+            squaredMeans->setMagnificationFilter(QOpenGLTexture::Nearest);
+            squaredMeans->allocateStorage();
+            squaredMeans->bind(2);
         }
     } else if (m_program->uniformLocation("shadowMap") != -1) {
     	// without Qt functions this time
@@ -1245,6 +1245,18 @@ void glShaderWindow::resize(int x, int y)
             computeResult->setMagnificationFilter(QOpenGLTexture::Nearest);
             computeResult->allocateStorage();
             computeResult->bind(2);
+        }
+        glActiveTexture(GL_TEXTURE4);
+        squaredMeans = new QOpenGLTexture(QOpenGLTexture::Target2D);
+        if (squaredMeans) {
+            squaredMeans->create();
+            squaredMeans->setFormat(QOpenGLTexture::RGBA32F);
+            squaredMeans->setSize(width(), height());
+            squaredMeans->setWrapMode(QOpenGLTexture::MirroredRepeat);
+            squaredMeans->setMinificationFilter(QOpenGLTexture::Nearest);
+            squaredMeans->setMagnificationFilter(QOpenGLTexture::Nearest);
+            squaredMeans->allocateStorage();
+            squaredMeans->bind(2);
         }
 #endif
         m_program->release();
@@ -1429,9 +1441,11 @@ void glShaderWindow::render()
     } 
     if (hasComputeShaders) {
         // We bind the texture generated to texture unit 2 (0 is for the texture, 1 for the env map)
-               glActiveTexture(GL_TEXTURE2);
+        glActiveTexture(GL_TEXTURE2);
         compute_program->bind();
 		computeResult->bind(2);
+        glActiveTexture(GL_TEXTURE4);
+		squaredMeans->bind(4);
         // Send parameters to compute program:
         compute_program->setUniformValue("center", m_center);
         compute_program->setUniformValue("radius", modelMesh->bsphere.r);
@@ -1446,6 +1460,7 @@ void glShaderWindow::render()
         compute_program->setUniformValue("shininess", shininess);
         compute_program->setUniformValue("eta", eta);
         compute_program->setUniformValue("framebuffer", 2);
+        compute_program->setUniformValue("squaredMeans", 4);
         compute_program->setUniformValue("colorTexture", 0);
         compute_program->setUniformValue("normalTexture", 3);
         compute_program->setUniformValue("counter", counter);

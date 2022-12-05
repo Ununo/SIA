@@ -469,18 +469,6 @@ vec4 directIllumination(vec4 color, vec4 p, vec4 n, vec4 v)
 	return ca + cd + cs;
 }
 
-// Gold Noise ©2015 dcerisano@standard3d.com
-// - based on the Golden Ratio
-// - uniform normalized distribution
-// - fastest static noise generator function (also runs at low precision)
-// - use with indicated fractional seeding method. 
-
-float PHI = 1.61803398874989484820459;  // Φ = Golden Ratio   
-
-float gold_noise(in vec2 xy, in float seed){
-       return fract(tan(distance(xy*PHI, xy)*seed)*xy.x);
-}
-
 // 3D simplex noise
 float snoise3(float x, float y, float z) {
 
@@ -715,6 +703,19 @@ vec4 trace(vec4 origin, vec4 dir)
     return vec4(0, 0, 0, 1);
 }
 
+// Gold Noise ©2015 dcerisano@standard3d.com
+// - based on the Golden Ratio
+// - uniform normalized distribution
+// - fastest static noise generator function (also runs at low precision)
+// - use with indicated fractional seeding method. 
+
+float PHI = 1.61803398874989484820459;  // Φ = Golden Ratio   
+
+float gold_noise(in vec2 xy, in float seed){
+       return fract(tan(distance(xy*PHI, xy)*seed)*xy.x);
+}
+
+
 layout (local_size_x = 8, local_size_y = 8) in;
 void main(void) {
 	// Convert local screen coordinates into world coordinates
@@ -725,8 +726,14 @@ void main(void) {
     }
 
     vec2 float_pix = pix;
-    float_pix.x += haltonx[counter%256];
-    float_pix.y += haltony[counter%256];
+    if (convergenceMode){
+        float_pix.x += haltonx[counter%256];
+        float_pix.y += haltony[counter%256];
+    }
+    else{
+        float_pix.x += gold_noise(float_pix.xy, counter);
+        float_pix.y += gold_noise(float_pix.xy, counter+1);
+    }
     
     vec2 pos = float_pix / size;
     // pos in [0,1]^2 Need it in [-1,1]^2:

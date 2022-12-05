@@ -144,6 +144,7 @@ private:
     QOpenGLTexture* normalTexture;
     QOpenGLTexture* permTexture;   // for Perlin noise
     QOpenGLTexture* computeResult; // output of compute shader
+    QOpenGLTexture* squaredMeans; // output of compute shader
     // Model
     QOpenGLBuffer m_vertexBuffer;
     QOpenGLBuffer m_indexBuffer;
