@@ -16,6 +16,7 @@
 #include <QHBoxLayout>
 #include <QComboBox>
 #include <QDebug>
+#include <QVector4D>
 #include <assert.h>
 
 #include "perlinNoise.h" // defines tables for Perlin Noise
@@ -1453,6 +1454,7 @@ void glShaderWindow::render()
     QMatrix4x4 lightCoordMatrix;
     QMatrix4x4 lightPerspective;
     QMatrix4x4 mat_inverse = m_matrix[0];
+    // QVector4D v = QVector4D(0, 0, 0, 1);
     QMatrix4x4 persp_inverse = m_perspective;
 
     if (isGPGPU || hasComputeShaders) {
@@ -1473,6 +1475,7 @@ void glShaderWindow::render()
         compute_program->setUniformValue("radius", modelMesh->bsphere.r);
         compute_program->setUniformValue("groundDistance", groundDistance * modelMesh->bsphere.r - m_center[1]);
         compute_program->setUniformValue("mat_inverse", mat_inverse);
+    	// std::cout << (mat_inverse * v)[0] << " " << (mat_inverse * v)[1] << " " << (mat_inverse * v)[2] << std::endl;
         compute_program->setUniformValue("persp_inverse", persp_inverse);
         compute_program->setUniformValue("lightPosition", lightPosition);
         compute_program->setUniformValue("lightIntensity", 1.0f);

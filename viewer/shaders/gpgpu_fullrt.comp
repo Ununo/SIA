@@ -590,7 +590,8 @@ void getLocal(vec4 origin, vec4 dir, hitinfo_t h, out vec4 color, out vec4 p, ou
         color = texture(colorTexture, h.t.pq);
         p.y = -groundDistance;
         if (normalMapping){
-            n = normalize(texture(normalTexture, h.t.pq));
+            vec4 norm = texture(normalTexture, h.t.pq) * 2 - 1;
+            n = normalize(vec4(norm.x, norm.z, -norm.y, 0));
         }
         else{
             n = vec4(0.0, 1.0, 0.0, 0.0);
