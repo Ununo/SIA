@@ -14,6 +14,7 @@
 #include <QtGui/QOpenGLFunctions>
 #include <QtGui/QScreen>
 #include <QMouseEvent>
+#include <QPushButton>
 
 
 class glShaderWindow : public OpenGLWindow
@@ -64,7 +65,6 @@ public slots:
     void updatePeriode2(int param);
     void updateHalton();
     void updateShowConv();
-    void updateBouncesNumber(int param);
 
 protected:
     void mousePressEvent(QMouseEvent *e);
@@ -134,7 +134,6 @@ private:
 
     bool halton;
     bool showConvergence;
-    int bounces;
 
     // OpenGL variables encapsulated by Qt
     QOpenGLShaderProgram *m_program;
@@ -184,6 +183,8 @@ private:
     QWidget* auxWidget; // window for parameters
     QWidget* container;
     QTimer* timer;
+    QPushButton* haltonButton;
+    QPushButton* convergenceButton;
     int counter;
 
 };
