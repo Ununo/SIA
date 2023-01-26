@@ -678,7 +678,8 @@ vec4 trace(vec4 origin, vec4 dir)
             state.costheta = dot(-normalize(newdir), normalize(N));
             ground_hit = ground_hit || hits.hit_vptr == GROUND_VPTR;
             if (transparent && !ground_hit){
-                float random = (haltonx[counter%256] + haltony[counter%256])/2;
+                int index = int(state.costheta*100) + int (neworigin.x *100 + neworigin.y *100 + neworigin.z *100);
+                float random = (haltonx[(counter + index)%256] + haltony[(counter + index + 1)%256])/2;
                 if (random > ftheta(state.costheta)){
                     // vec4 plat = normalize(newdir - dot(newdir, N) * N);
                     // float temp = n1;
@@ -848,8 +849,8 @@ void main(void) {
 
     vec2 float_pix = pix;
     if (convergenceMode){
-        float_pix.x += haltonx[counter%256];
-        float_pix.y += haltony[counter%256];
+        float_pix.x += haltonx[(counter+pix.x + pix.y)%256];
+        float_pix.y += haltony[(counter+pix.x + pix.y+1)%256];
     }
     else{
         float_pix.x += (gold_noise(float_pix.xy, counter) + 1)/2;
