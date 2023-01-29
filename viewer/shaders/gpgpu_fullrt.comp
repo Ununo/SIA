@@ -665,6 +665,7 @@ vec4 trace(vec4 origin, vec4 dir)
     vec4 neworigin = origin;
     vec4 newdir = dir;
     bool ground_hit = false;
+    float used_eta = eta;
 
     for (int i = 0; i< MAX_TRACE + 1; i++){
         trace_state_t state;
@@ -681,20 +682,9 @@ vec4 trace(vec4 origin, vec4 dir)
                 int index = int(state.costheta*100) + int (neworigin.x *100 + neworigin.y *100 + neworigin.z *100);
                 float random = (haltonx[(counter + index)%256] + haltony[(counter + index + 1)%256])/2;
                 if (random > ftheta(state.costheta)){
-                    // vec4 plat = normalize(newdir - dot(newdir, N) * N);
-                    // float temp = n1;
-                    // float sintheta2 = sqrt(1 - state.costheta*state.costheta);
-                    // float costheta2 = abs(state.costheta);
-                    // if (sintheta2 < 0 || costheta2 <0){
-                    //     newdir = newdir - 2 *dot(newdir, N) * N;
-                    // }
-                    // else{
-                    //     n1 = n2;
-                    //     n2 = temp;
-                    //     newdir = costheta2 * N - sintheta2 * plat ;
-
-                    // }
                     p += 0.001 * newdir;
+                    newdir = refract(newdir, N, used_eta);
+                    used_eta = 1/ used_eta;
                     if (i != MAX_TRACE){
                         fallback[i] = true;
                     }
@@ -706,25 +696,6 @@ vec4 trace(vec4 origin, vec4 dir)
                     newdir = newdir - 2 *dot(newdir, N) * N;
                     fallback[i] = false;
                 }
-                
-                // else{
-                //     fallback[i] = true;
-                //     neworigin = p;
-                // }            
-                // else{
-                //     vec4 plat = normalize(newdir - dot(newdir, N) * N);
-                //     float temp = n1;
-                //     float sintheta2 = sqrt(1 - state.costheta*state.costheta);
-                //     float costheta2 = abs(state.costheta);
-                //     if (sintheta2 < 0 || costheta2 <0){
-                //         newdir = newdir - 2 *dot(newdir, N) * N;
-                //     }
-                //     // else{
-                //     //     n1 = n2;
-                //     //     n2 = temp;
-                //     //     newdir = costheta2 * N - sintheta2 * plat ;
-                //     // }
-                // }
             }
             else{
                 newdir = newdir - 2 *dot(newdir, N) * N;
