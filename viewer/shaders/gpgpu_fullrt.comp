@@ -665,7 +665,6 @@ vec4 trace(vec4 origin, vec4 dir)
     vec4 neworigin = origin;
     vec4 newdir = dir;
     bool ground_hit = false;
-    float used_eta = eta;
 
     for (int i = 0; i< MAX_TRACE + 1; i++){
         trace_state_t state;
@@ -683,8 +682,7 @@ vec4 trace(vec4 origin, vec4 dir)
                 float random = (haltonx[(counter + index)%256] + haltony[(counter + index + 1)%256])/2;
                 if (random > ftheta(state.costheta)){
                     p += 0.001 * newdir;
-                    newdir = refract(newdir, N, used_eta);
-                    used_eta = 1/ used_eta;
+                    newdir = refract(normalize(newdir), N, 1/eta);
                     if (i != MAX_TRACE){
                         fallback[i] = true;
                     }
